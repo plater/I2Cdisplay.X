@@ -1,218 +1,153 @@
-/* 
- * File:   buffers.h
- * Author: Dave Plater
+/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
+ * and any derivatives exclusively with Microchip products. 
  * 
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
+ * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
+ * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
  *
- * Created on 20 October 2020, 1:46 PM
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
+ * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
+ * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *
+ * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
+ * TERMS. 
  */
 
+/* 
+ * File:   
+ * Author: 
+ * Comments:
+ * Revision history: 
+ */
 
-#ifndef __BUFFERS_H    /* Guard against multiple inclusion */
-#define __BUFFERS_H
-#include "mcc_generated_files/mcc.h"
-#include <stdio.h>
-#include "xpms.h"
+// This is a guard condition so that contents of this file are not included
+// more than once.  
+#ifndef XC_HEADER_TEMPLATE_H
+#define	XC_HEADER_TEMPLATE_H
+
+#include <stdbool.h>
+#include <string.h>
+#include <errno.h>
+/* Get ptrdiff_t.  */
+#include <stddef.h>/* Use the signed type 'ptrdiff_t'.  */
+/* Note: ISO C does not mandate that 'size_t' and 'ptrdiff_t' have the same
+   size, but it is so on all platforms we have seen since 1990.  */
+typedef ptrdiff_t idx_t;
+#include <proc/pic18f47k40.h>
+#include <xc.h> // include processor files - each processor file is guarded.  
 
 
-/* ************************************************************************** */
-/* ************************************************************************** */
-/* All the buffers used across files  include this to use                                                 */
-/* ************************************************************************** */
-/* ************************************************************************** */
+#endif	//XC_HEADER_TEMPLATE_H
 
-/* Provide C++ Compatibility */
-#ifdef __cplusplus
-extern "C" {
-#endif
-//Fits on 40 pin DIP PIC18F47Q83
-static char *searchbuf;
-#define TRANS 0
-#define LCD_WIDTH   136// Note: x-coordinates go wide
-#define LCD_HEIGHT  64 // Note: y-coordinates go high
-#define WHITE       0  // For drawing pixels. A 0 draws white.
-#define BLACK       1  // A 1 draws black.
-//For I2C
-
-#if 0
-struct bufflags
-{
-	unsigned retransmit : 1;
-	unsigned meerror : 1;
-	unsigned mtn : 1;
-	unsigned msgavl : 1;
-	unsigned abrtmsg : 1;
-	unsigned eomsg : 1;
-	unsigned msggod : 1;
-	unsigned sigtest : 1;
-} ;
-
-#endif
-// __attribute__ ;
-//__attribute__ ((externally_visible))
-/** tcp.h imports 
-struct gsmflags; 
-struct vendflags;*/
-//Gsm related memory
-extern uint8_t gsmbyte;
-//moble network code 01 = Vodacom, 10 or 12 = Mtn
-extern uint8_t mncbyte;
-//gsm scratch pad
-extern uint8_t pD[8]; //I2C send/receive buffer
-extern uint8_t gsmmsg[512];// __attribute__((section("tcpsection"),address(0xA0001000)));
-extern uint8_t gsmusd[128];
-extern uint8_t gsmusm[24];
-extern uint8_t gsmtim[23];
-extern uint8_t gsdate[10];
-extern uint8_t gstime[10];
-extern uint8_t phnumb[11];
-extern uint8_t noofline;
-extern uint8_t slaveDeviceAddress;
-extern uint8_t gstime[10];
-
-static uint8_t qprice[8] = "1000";
-
-extern uint8_t transid[24];// __attribute__((section("tcpsection")));// = "\"id\":";//"id":999999,
-extern uint32_t cntlength ;//__attribute__((section("tcpsection")));
-static uint8_t __attribute__((externally_visible)) qrbuffer[1733]; ;
-//I2C section
-//const uint16_t I2CAdd = 0x78;
-
-extern uint8_t qchan[2];
-//uint8_t qprice[4];
-extern uint32_t translngth;
-
-extern uint8_t * searchbufa;
-
-//uint8_t headerbuf[1460];
-
-extern uint32_t price;
-
-/*Fixed messages 18 characters max*/
-static const uint8_t merrefstr[] = "\"merchantReference\":\""; //21 characters ref at 22
-static const uint8_t lengthstr[] = "Content-Length: ";//15 characters Length at 16
-static const uint8_t pricemsg[] = " Price R";
-static const uint8_t scanmsg[] = " Scan qr to vend";//16 characters
-static const uint8_t aprovemsg[] = "Amount Approved";
-static const uint8_t declinemsg[] = "Amount Declined";
-static const uint8_t clockdate[] = "  Date:";
-static const uint8_t clocktime[] = "  Time:";
-
-void Start_TMR4(void);
-
-void Start_TMR1(void);
+    bool ledredflash;
+    bool ledgreenflash;
+    bool ledredon;
+    bool ledgreenon;
+    bool ledslow;
+    bool ledfast;
+    bool ledchange;
     
-void Delay_60mil(void);
+    uint8_t ledspeed;
+    uint8_t ledratio;
 
-void Write_Font(uint8_t _font);
+//Gsm related memory
+uint8_t gsmbyte;
+//moble network code 01 = Vodacom, 10 or 12 = Mtn
+uint8_t mncbyte;
+uint16_t credit;
+uint16_t csqval;
+//gsm scratch pad
+//Gsm related memory
+//uint8_t gsmbyte =error: 0;
+//moble network code 01 = Vodacom, 10 or 12 = Mtn
+//uint8_t mncbyte = 0;
+//gsm scratch pad
+uint8_t gsmmsg[512];
+//sms storage
+uint8_t gsmums[512];
+//ussd storage
+uint8_t gsmusd[128];
+//Store unsolicited notifications
+uint8_t gsmusm[128];
+uint8_t gsmtim[23];
+//Store date
+uint8_t gsdate[10];
+//Store time
+uint8_t gstime[10];
+//Phone number scratch pad
+uint8_t phnumb[11];
+uint8_t noofline;
+uint16_t index;
 
-void Set_Page(uint8_t gpage);
 
-void Set_Column(uint8_t col);
+uint8_t  gsmtim[23];
+uint8_t  qrbuffer[256];
+char     base64buf[64];
+char     snap64buf[256];
+uint8_t  merchkey[40];
+uint8_t merchid[16];
+uint8_t snapcode[16];//MID to compare
+uint16_t  prices[8];
 
-void Set_Line(uint8_t line);//Start from line
+//uint8_t qchan[2];
+//uint8_t qprice[4];
 
-void Clr_Line(void);//Clear the current line
+signed int translngth;
+uint8_t transid[10];//195
+unsigned long long cntlength;
+unsigned long long countstore;
+uint8_t urlbuf[200];
 
-void Write_String(uint8_t *lcdstring, uint8_t lcdline);
+uint8_t * searchbufa;
 
-void Continue_String(uint8_t *clcdstring);
+int price;
+uint8_t channum;
+/**dispense related
+ */
+volatile uint8_t cash;
+volatile uint8_t buttons;
+volatile uint16_t vendprice;
+volatile uint8_t sensorval;
+volatile uint8_t vcash[2];
+volatile uint8_t nvcash[3];
+volatile uint8_t tvends[8];
+volatile uint8_t vcashout[2];
+volatile uint16_t pvcash;
+volatile __uint24 pnvcash;
+volatile uint8_t senspos;
+volatile uint8_t dummy[8];
+volatile uint8_t highprice;
+volatile uint8_t lowprice;
+volatile uint8_t chanmask;
+volatile uint8_t errormask;
+volatile uint8_t channel;
+volatile uint8_t stock;
 
-void Graphic_Clear(void);
 
-void Graphic_qrcode(uint32_t amount, uint8_t id);
+/*static const uint8_t clockdate[] = "  Date:";
+static const uint8_t clocktime[] = "  Time:";
+*/
+void build_record_url(char * restrict basebuf, const char * restrict snapurl );
 
-void Write_Qrcode(void);
+void snap_buildurl(void);
 
-void Store_XPM(uint8_t *xpmname);
+void build_url(void);
 
-void printQr(uint8_t qrcode[]);
+void led_opperate(void);
 
-void Graphic_test(void);
+void led_switch(uint8_t color);
 
-void Convert_price(uint32_t prval);
+void price_init(void);
 
-void displ_hex(uint32_t hexnum);
+void price_set(void);
 
-void Graphic_init(void);
-
-void Load_Qrcode(const uint8_t xpmname[]);
-
-void SPI_write8bit(uint8_t data);
-
-void Delay_abit();
-
-void Sample_code(void);
-
-I2C2_MESSAGE_STATUS ssd1306_write(uint8_t *pdata, uint8_t msize, uint8_t command);
-
-I2C2_MESSAGE_STATUS I2C_Write_Command(uint8_t mlength);
-
-I2C2_MESSAGE_STATUS I2C_Write_Data(uint8_t mlength);
-
-I2C2_MESSAGE_STATUS I2C_Write_Address(uint8_t mlength);
-
-void I2c_write_block(uint8_t *sourceData, uint8_t length, I2C2_MESSAGE_STATUS stat);
-//void disp_clock(uint8_t* tgsdate, uint8_t* tgstime);
-
-void gsm_zerobuff(uint8_t* gsmsgbuf, uint16_t count );
-
-void gsm_waitx(void);
-
-void gsm_waitr(void);
-
-void gsm_transmit(uint8_t txbyte);
-
-void gsm_gettime(void);
-
-void get_radio(void);
-
-void sig_strength(void);
-
-void check_num(void);
-
-void parse_sms(void);
-
-void gsm_numack(void);
-
-void gsm_getbalance(void);
-
-void gsm_setime(void);
-
-void parse_date_time(void);
-
-uint8_t gsm_unsolic(void);
-
-void clock_display(void);
-
-void start_sms(void);
-
-void sms_report(void);
-
-void delay_second(uint8_t stime);
-
-void delay_milli(uint8_t mtime);
-
-uint8_t write_sms(uint8_t i, uint8_t *msgpnt);
-
-uint8_t* convert_hex(uint32_t hexnum);
-
-void gsm_receive(uint8_t noofline, uint8_t *messagebuf);
-
-void gsm_msg(uint8_t *msgadd);
-
-void gsm_init(void);
-
-void gsm_txAT(void);
-
-void gsm_on(void);
-
-uint8_t gsm_Read(void);
-
-void gsm_off(void);
-
-void gsm_netwait(void);
-
-uint8_t EUSARTG_Read(void);
+void One_Second(void);
 
 /** Prototypes from tcpip.h */
 void tcp_httpget(uint8_t httpurl[128], bool sslflag);
@@ -227,60 +162,104 @@ void tls_getseed(void);
 
 int OpenConnection(void);
 
-#ifdef __unix
-int sock_read(void *ctx, unsigned char *buf, size_t len);
+void dispense(uint8_t chanel);
 
-int sock_write(void *ctx, const unsigned char *buf, size_t len);
-#endif //__unix
+void gprs_off(void);
 
-void tgsm_msg(uint8_t *msgadd);
+uint8_t Read_timeoutg(uint8_t *msgadd);
 
-void tgsm_receive(uint8_t noofline, uint8_t *messagebuf);
+uint8_t Read_timeout(uint8_t *msgadd);
 
-/** Unix serial prototypes */
+uint8_t Read_timeout1(uint8_t *msgadd);
 
-void set_blocking(int fds, int should_block);
+uint8_t Read_timeout2(uint8_t *msgadd); //10ms timeout with interrupt read
 
-int set_interface_attribs(int fd, uint32_t speed, int parity);
+uint8_t get_csq(void);
 
-bool gsm_waitstart(void);
+void Display_csq(void);
 
-void ntp_connect(void);
+int int_sms_notify(void);
 
-bool tcp_getip(void);
+bool Sort_sms(void);
 
-void tcp_getsnapscan(bool getpayment);
+void base64_encode (const uint8_t *in, idx_t inlen, uint8_t *out, idx_t outlen);
 
-void tcp_gethead(void);
+void store_mid(void);
 
-void tcp_close(void);
+bool check_mid();
 
-void get_snaprecord(void);
+void store_merchkey(void);
 
-uint8_t tcp_getid(void);
+void mkey_init(void);
 
-void tcp_connect(void);
+void mid_init(void);
 
-void tcp_ping(void);
+bool delay_10mS(uint16_t count);
 
-void tcp_httpget(uint8_t httpurl[128], bool sslflag);
+bool Read_Service(void);
 
-void http_receive(uint8_t noofline, uint8_t *messagebuf);
+uint8_t Long_Press(void);
 
-uint32_t ascnumtohex(uint8_t *numberbuf);
+void dispense_test(void);
 
-void tgsm_msg(uint8_t *msgadd);
+void Orange_light(void);
 
-void tgsm_receive(uint8_t noofline, uint8_t *messagebuf);
+void Store_Count(void);
+
+bool Retrieve_Count(void);
+
+uint8_t Check_Stock(void);
+
+void Set_LED_out(void);
+
+void Set_LED_in(void);
+
+void LED_colour(void);
+
+void DATAEE_WriteWord(uint16_t bAdd, uint16_t bData);
+
+uint16_t DATAEE_ReadWord(uint16_t bAdd);
+
+void Write_Font(uint8_t _font);
+
+void SPI_write8bit(uint8_t data);
+
+void Write_Qrcode(const uint8_t xpmname[]);
+
+void Graphic_Clear(void);
+
+void Graphic_test(void);
+
+void Graphic_init(void);
+
+/** ***** I2C routines *****/
+
+void ssh1106_write(uint8_t pdata, uint8_t msize, uint8_t command);
+
+bool I2C_Start(uint8_t slave_write_address);
+
+void I2C_Ready(void);
+
+bool I2C_Write(uint8_t data);
+
+bool I2C_Stop(void);
+
+uint8_t I2C_Read(uint8_t flag);
+
+void I2C_Ack(void);
+
+void I2C_Nack(void);
 
 
-    /* Provide C++ Compatibility */
-#ifdef __cplusplus
+#ifdef	__cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+    // TODO If C++ is being used, regular C code needs function names to have C 
+    // linkage so the functions can be used by the c code. 
+
+#ifdef	__cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-#endif /* _EXAMPLE_FILE_NAME_H */
 
-/* *****************************************************************************
- End of File
- */

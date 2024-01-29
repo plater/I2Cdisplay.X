@@ -8,6 +8,7 @@
 #include "buffers.h"
 #include "display.h"
 #include "dispfont.h"
+#include "mcc_generated_files/examples/i2c2_master_example.h"
 #include "qrcodegen.h"
 
 //Lower and upper 4 bit column addresses added to 0x01 for upper and 0x0 for lower
@@ -142,14 +143,14 @@ void Graphic_test(void)
 void disp_clock(void)
 {
     Graphic_Clear();
-    gsm_gettime();
+ //   gsm_gettime();
     Write_String((uint8_t*)clockdate, 2);
     Continue_String(gsdate);
     Write_String((uint8_t*)clocktime, 3);
     Continue_String(gstime);
 }
 
-void Convert_price(uint32_t prval)
+/*
 {
     signed char i = 0;
     uint8_t value[16];
@@ -182,7 +183,7 @@ void displ_hex(uint32_t hexnum)
        Write_Font(0x30);
     }
 }
-
+*/
 /*
 void Graphic_test(void)
 {
@@ -269,8 +270,6 @@ void Graphic_init(void)
     uint16_t        nCount;
     uint32_t        y, x;
     uint8_t         z, i, msize ;
-    slaveDeviceAddress = I2CAdd;
-    I2C2_MESSAGE_STATUS status = I2C2_MESSAGE_PENDING;
 //    pD = INIT_SSD1306;
     y = sizeof(INIT_SSD1306) + INIT_SSD1306; //Don't go further than the end of INIT_SSD1306
     //y--;
@@ -281,20 +280,13 @@ void Graphic_init(void)
     {
         msize = *pData; //Load size of command string
         pData++; //Next command
-//        x++;
-/*        pD[0] = COMMAND;
-        DData = pD;
-        DData++;
-        memcpy(DData, pData, msize);*/
-        retry:
-        status = ssd1306_write(pData, msize, COMMAND);
-        if(status = I2C2_MESSAGE_COMPLETE)
+        
+        while(msize > x)
         {
-            pData = pData + msize; //pdata points to next command location
-        }
-        else
-        {
-            goto retry;
+            i = *pData;
+            SPI_write8bit(i);
+            x++;
+            pData++;
         }
     } //end while(i <= x)
     y = y + z;
@@ -367,7 +359,7 @@ void SPI_write8bit(uint8_t data)
     {
         command = 0; //Write command
     }
-    ssd1306_write(&data, 1, command);
+    ssh1106_write(data, 1, command);
 }
 
 #endif //SPI_COMS
@@ -375,7 +367,7 @@ void SPI_write8bit(uint8_t data)
  bool qrcodegen_encodeText(const char *text, size_t textLen, uint8_t tempBuffer[], uint8_t qrcode[],
 	enum qrcodegen_Ecc ecl, int minVersion, int maxVersion, enum qrcodegen_Mask mask, bool boostEcl);
 */
-
+#if 0
 void Graphic_qrcode(uint32_t amount, uint8_t id)
 {
     repeatcode:;
@@ -402,10 +394,15 @@ bool ok = qrcodegen_encodeText(text, tempBuffer, qrcode, qrcodegen_Ecc_MEDIUM,	q
     }
 
 }
+#endif
+void QRDisplay(uint8_t * xpmname)
+{
+    
+}
 
 void printQr(uint8_t qrcode[])
 {
-    for(int i = 0; i < 2048; i++)
+    for(int i = 0; i < 1734; i++)
     {
         qrbuffer[i] = 0;
     }
@@ -419,7 +416,7 @@ void printQr(uint8_t qrcode[])
 		qrbuffer[blackb++] = 'E'; //Pad an extra 4 Bs either side of the E
 	}
     qrbuffer[++blackb] = 0;
-    Write_Qrcode();
+    Write_Qrcode(qrbuffer);
 }
 /*/* XPM */
 //static const char *const chan1_xpm[] = {
@@ -443,32 +440,46 @@ void Store_XPM(uint8_t *xpmname)
 void Load_Qrcode(const uint8_t xpmname[])
 {
     uint8_t *x = memcpy(qrbuffer, xpmname, sizeof(xpmname));
-    Write_Qrcode();
+    Write_Qrcode(xpmname);
 }
 
 
 //Position page 2 to 7 column 43
 //Display qrcode on screen.
-void Write_Qrcode(void)
+void Write_Qrcode(const uint8_t xpmname[])
 {
 	CS1_SetLow();
 	ypos = 43;
 	pagepos = 2;
-	uint16_t z = 0;
-	uint16_t zbu=0;
-	uint8_t qrbyte = 0;
+	static uint16_t z, xpmlng, scrat, noline;
+    z = 0;
+    uint16_t x;
+	uint8_t qrbyte;
 	uint8_t linecount = 0;
 	uint16_t qrcount = 0;
+    uint16_t l, zbu;
+    uint8_t *e;
+    zbu=0;
+    qrbyte = 0; // holds xpm pixel value
+    xpmlng = strlen(xpmname);
+    e = memchr(xpmname, 'E', 64); //find the line length
+    l = e - xpmname;              //store it's value in l
+    l++;
+    noline = xpmlng / l;
 	SS_A0_SetHigh();
 	Set_Column(ypos);
 	Set_Page(pagepos);
 	readcode:;
-	uint8_t qbyte = 0;
-	for(int x=0; x < 8; x++)
+	uint8_t qbyte = 0; //qbyte holds raw graphic page value (page = 8 y bits)
+	for(x=0; x < 8; x++)
 	{
+        if(z >= xpmlng)
+        {
+            scrat = z - xpmlng;
+        }
 		qbyte = qbyte >> 1;
-		qrbyte = qrbuffer[z];
-        if(qrbyte == 0)
+		qrbyte = xpmname[z]; //z contains position from start of line
+        if(qrbyte == 0) // NULL string end
         {
             goto exitqr;
         }
@@ -494,11 +505,15 @@ void Write_Qrcode(void)
 			qbyte = qbyte & 0x7F;
 		}
 
-		z = z + 42;
+		z = z + l;
 
 	}
 	SPI_write8bit(qbyte);
 	z = ++zbu;
+    if(z >= xpmlng)
+    {
+        scrat = z - xpmlng;
+    }
 	goto readcode;
 
 
@@ -529,7 +544,7 @@ void Graphic_Clear(void)
     LATDbits.LATD3 = 1; //Deselect display
    
 }
-
+#if 0
 void Sample_code(void)
 {
     // initialize the module
@@ -675,7 +690,7 @@ void I2c_write_block(uint8_t *sourceData, uint8_t length, I2C2_MESSAGE_STATUS st
 
         
 }
-
+#endif
 
 /* MCLKSEL PBCLK; DISSDO enabled; SRXISEL Last Word is Read; CKP Idle:High, Active:Low; FRMEN disabled; FRMSYPW One-Clock;
   SSEN disabled; FRMCNT 32; MSSEN disabled; MSTEN Master; MODE16 disabled; FRMPOL disabled; SMP End; SIDL disabled;

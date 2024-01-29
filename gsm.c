@@ -1,56 +1,49 @@
 /* 
  * File:   gsm.c
  * Author: Dave Plater
- * Ported from PIC18F47KXX
  *
- * Created on 20 June 2020, 1:46 PM
+ * Created on September 26, 2018, 3:14 PM 
  */
 #include "gsm.h"
-#include "buffers.h"
 
-uint8_t slaveDeviceAddress;
-uint8_t gsmbyte;
-uint8_t gsmusd[128];
-uint8_t gsmusm[24];
-
-uint8_t gsmtim[23];
-
-#if 1
-struct 
+void fast_ledflash(bool colour)
 {
-    unsigned retransmit : 1;
-    unsigned meerror : 1;
-    unsigned mtn : 1;
-    unsigned msgavl : 1;
-    unsigned abrtmsg : 1;
-    unsigned eomsg : 1;
-    unsigned msggod : 1;
-    unsigned sigtest : 1;
-} gsmflags;
-#endif
-//uint8_t gsmusd;
-//uint8_t transid[24] __attribute__((section("tcpsection")));
-///Wait for buffer empty
+    if(colour) //red = 1 and ledgreen = 0
+    {
+        
+    }
+}
+
+void slow_ledflash(bool colour)
+{
+    if(colour)
+    {
+        
+    }
+}
+
+//Wait for buffer empty
 void gsm_waitx(void)
 {
-    U2STAbits.UTXEN = 1;
-    while(U2STAbits.UTXBF)
+    TX1STAbits.TXEN = 1;
+    while(!PIR3bits.TX1IF)
     {
     }
 }
 //Wait for buffer empty
 void gsm_waitr(void)
 {
-    while(!(U2STAbits.URXDA == 1))
+    while(!PIR3bits.RC1IF)
     {
+        
     }
 }
 
 void gsm_transmit(uint8_t txbyte)
 {
-    U2STAbits.UTXEN = 1;
-    UART2_Write(txbyte);
-    while(!U2STAbits.TRMT){}
+    TX1STAbits.TXEN = 1;
+    EUSARTG_Write(txbyte);
+    while(!TX1STAbits.TRMT){}
 }
 
 void gsm_zerobuff(uint8_t* gsmsgbuf, uint16_t count )
@@ -66,7 +59,7 @@ void gsm_zerobuff(uint8_t* gsmsgbuf, uint16_t count )
 
 void gsm_msg(uint8_t *msgadd)
 {
-    uint32_t msgbkup = msgadd;
+    __uint24 msgbkup = msgadd;
     retrans:
     msgadd = msgbkup;
     gsmflags.retransmit = 0;
@@ -84,623 +77,475 @@ void gsm_msg(uint8_t *msgadd)
 }
 
 //BAUDCONbits.ABDEN
-void gsm_init(void)
+void gsm_init(bool inittype)
 {
-//    PIE3bits.RC2IE =1; P18 rx int enable
-    gsmflags.meerror = 0;
-//    eusart2RxCount = 512;
-//    gsm_zerobuff(gsmusd, 0x80);
-    int i = 0;
-  //Make sure that 5 seconds have passed.
-     while(!TMR2_GetElapsedThenClear())
+    
+    uint16_t x;
+    uint8_t y;
+    repeatoff:
+    led_switch(2); //Off
+    gsm_zerobuff(gsmusd, 127); 
+    y = gsm_on();
+    led_switch(1);//RED
+//    x = strstr(gsmusd, "RDY");
+    if(y <= 4)                                                                                                                                                                                                                                      if(y == 0)
     {
-        TMR2_Tasks_32BitOperation();
-    }
-    TMR2_Stop();      
-    //Transmit AT\r to sync baud rate. 
-    gsm_txAT();
-    gsm_transmit(0x0D);
-    //Response AT\r\r\nOK\r\n
-    //No AT means no GSM
-    gsm_receive(1, gsmusd);
-    if(gsmusd[0] != '0')
-    {
+        gsm_txAT();//Transmit AT\r to sync baud rate.
+        gsm_transmit(0x0D);
         gsm_receive(1, gsmusm);
+        gsm_msg("AT&F\r");
+        x = Read_timeout1(gsmusd);
+        gsm_msg("AT&F0\r");
+        x = Read_timeout1(gsmums);
+        gsm_msg("AT&V0\r");
+        x = Read_timeout1(gsmmsg);
+        gsm_msg("AT&V\r");
+        x = Read_timeout1(qrbuffer);
+        gsm_msg("AT&D0\r");
+        gsm_receive(1, gsmusd);
+        gsm_msg("AT+IPR=115200\r"); // 115200 or 57600 or 19200
+//        gsm_msg("AT+IPR=0\r");
+        gsm_receive(2, gsmusm);
+        gsm_msg("AT&W0\r");
+        gsm_receive(1, gsmums);
+        asm("reset");
     }
+    uint8_t *q;
+    //Search for "+CPIN: NOT INSERTED"
+    // void *memchr(const void *s, int c, size_t n);
+    q = strstr(gsmusd, "+CFUN:"); // WARNING: The quote doesn't exist in the manual
+    if(q)
+    {
+        if(!(memchr(q, '1', 10)))
+        {
+            asm("reset");
+        }
+    }
+    else
+    {
+        goto repeatoff;
+    }
+        
+//    gsmbyte = Read_timeout1(gsmusd);
+    //gsm_unsolic(); //Populates gsmmsg
+    errorecho:
     gsm_msg((uint8_t*)noecho);
-    gsm_receive(1, gsmusd);
+    if(!inittype)
+    {
+        gsm_receive(1, gsmusd);
+    }
     //
-	gsm_msg((uint8_t*)"AT+CREG=0\r");
-	gsm_receive(1, gsmusd);
+/*    uint8_t msgstr[24] = "AT+COPN\r";
+    gsm_msg((uint8_t*)msgstr);
+    gsmbyte = Read_timeout(gsmusd);
+    gsm_msg((uint8_t*)"AT+CPOL?\r");
+    gsmbyte = Read_timeout(gsmusd);
+*/
+    if(gsmflags.retransmit)
+    {
+        goto errorecho;
+    }
+    led_switch(3); //LED toggle GREEN
+	gsm_msg((uint8_t*)"AT+CREG=1\r");
+	gsm_receive(1, gsmusm);
+    ClrWdt();
+    led_switch(0); // Red = 1
 	gsmwait:
+    __delay_ms(2);
+    led_switch(3);
 	gsm_msg((uint8_t*)"AT+CREG?\r");
 	gsm_receive(2, gsmusd);
-	if(gsmusd[9] != '1')
-	{
-		goto gsmwait;
-	}
-	gsm_msg((uint8_t*)"AT+CSQ\r");
-	gsm_receive(2, gsmusd);
+    q = strstr(gsmusd, "+CREG:");
+    if(q)
+    {
+        if(!(memchr(q + 9, '1', 4)))
+        {
+            goto gsmwait;
+        }
+    }
+    else
+    {
+        goto repeatoff;
+    }
+    led_switch(2); //LED toggle GREEN
+    uint8_t w = get_csq();
+    if(w <= 0)
+    {
+        goto repeatoff;
+    }
+    if(w > 9)
+    {
+        //10 - 14, 15 - 19, 20 - 24 and >= 25
+        LED4_SetHigh();
+    }
+    if(w > 14)
+    {
+        LED3_SetHigh();
+    }
+    if(w > 19)
+    {
+        LED2_SetHigh();
+    }
+    if(w > 24)
+    {
+        LED1_SetHigh();
+    }
+    
     gsm_msg((uint8_t*)tsoftid);
     gsm_receive(2, gsmusd);
+    led_switch(1);
 }
 
-void delay_second(uint8_t stime)
+uint8_t get_csq(void)
 {
-    TMR2_Initialize();
-    TMR2_Start();
-    more_seconds:
-    while(!IFS0bits.T3IF){}
-    if(--stime > 0)
+    uint8_t *m;
+    gsm_msg((uint8_t*)"AT+CSQ\r");
+	gsm_receive(2, gsmusd);
+    m = strstr(gsmusd, "+CSQ:");
+    if(m > 0)
     {
-        TMR2_Initialize();
-        TMR2_Start();
-        goto more_seconds;
+        m = m + sizeof("+CSQ:");
+        csqval = atoi(m);
     }
-}
-
-void delay_milli(uint8_t mtime)
-{
-    TMR1_Initialize();
-    TMR1_Start();TMR1_Start();
-   more_mili:
-    while(!IFS0bits.T1IF){}
-    if(--mtime > 0)
+    else
     {
-        TMR1_Initialize();
-        TMR1_Start();
-        goto more_mili;
+        led_switch(3); //Toggle led between green and red
+        csqval = 0;
     }
+    return (uint8_t)csqval;
 }
-
 /*
-    gsm_msg((uint8_t*)smstxt);
-    gsm_receive(1, gsmusd);
-    
-    gsm_msg((uint8_t*)smsdel);
-    gsm_receive(1, gsmusd);
-    
-    gsm_getbalance();
-    
-    gsm_msg((uint8_t*)smslst);
-    gsm_receive(1,gsmusd);
-    
-    gsm_msg((uint8_t*)smdqry);
-    gsm_receive(1, gsmusd);
-    
-    gsm_msg((uint8_t*)engqry);
-    gsm_receive(2, gsmusd);
-    
-    gsm_msg((uint8_t*)netoff);
-    gsm_receive(2, gsmusd);
-   
-    gsm_msg((uint8_t*)facres);
-    gsm_receive(1, gsmusd);
-    goto gsminit;
-    __asm__("nop");
+*  The RSSI values returned by the CSQ command is mapped to dBm value in the table below.
+*  In the above example, rssi value of 25 corresponds to -63 dBm which implies an excellent signal condition.
+Value 	RSSI dBm 	Condition
+2 	-109 	Marginal
+3 	-107 	Marginal
+4 	-105 	Marginal
+5 	-103 	Marginal
+6 	-101 	Marginal
+7 	-99 	Marginal
+8 	-97 	Marginal
+9 	-95 	Marginal 0 = 
+10 	-93 	OK        0x0A 1010 0101
+11 	-91 	OK        0x0B 1011
+12 	-89 	OK        0x0C 1100
+13 	-87 	OK        0x0D 1101
+14 	-85 	OK        0x0E 1110
+15 	-83 	Good      0x0F 1111
+16 	-81 	Good      0x10 1 0000
+17 	-79 	Good      0x11 1 0001
+18 	-77 	Good      0x12 1 0010
+19 	-75 	Good      0x13 1 0011
+20 	-73 	Excellent 0x14 1 0100
+21 	-71 	Excellent 0x15 1 0101
+22 	-69 	Excellent 0x16 1 0110
+23 	-67 	Excellent 0x17 1 0111
+24 	-65 	Excellent 0x18 1 1000
+ * 
+25 	-63 	Excellent 0x19 1 1001
+26 	-61 	Excellent
+27 	-59 	Excellent
+28 	-57 	Excellent  F
+29 	-55 	Excellent
+30 	-53 	Excellent
 */
-void clock_display(void)
+//#if 0
+/*    gsm_msg((uint8_t*)"AT+CANT?\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CEGPRS=1,2\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+ECHARGE?\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+ECHARGE=1\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+ECHARGE=0\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CBC\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CBATCHK?\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CBATCHK=1\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CBATCHK=0\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CBAND?\r");
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSDT?\r");//Switch on or off Detecting SIM Card
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CGID\r");//Get SIM Card Group Identifier
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT*CELLLOCK?\r");//*Set the List of ARFCN Which Needs to Be Locked - 
+
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSDT=0\r");// Don't detect sim
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSDT=1\r");//Detect sim
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSMINS?\r");//SIM Inserted Status Reporting
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSMINS=0\r");//Disable unsolicited result code
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSMINS=1\r");//Enable unsolicited result code
+    Read_timeout1(gsmmsg);//AT+CANT
+    gsm_msg((uint8_t*)"AT+CANT?\r");//Antenna Detecting
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CNETSCAN\r");//Disable unsolicited result code
+    Read_timeout1(gsmmsg);
+    gsm_msg((uint8_t*)"AT+CSMINS=1\r");//Enable unsolicited result code
+    Read_timeout1(gsmmsg);//AT+CANT*/
+ //#endif
+
+
+//Read until 3 second timeout for initialisation of network
+//return message count
+uint8_t Read_timeout1(uint8_t *msgadd)
 {
-    gsmflags.sigtest = 0;
-    sig_strength();
-//    INTCONbits.PEIE = 0;//Disable interrupt
-//    PIE3bits.RC2IE =0; //Usart Disable interrupt
-    dispclka:
-    TMR2_Initialize();
-    TMR2_Start();
-    gsm_gettime();
-    disp_clock();
-//    INTCONbits.PEIE = 0;
-    gsmflags.msgavl = 0;
-    if(1 == 1)
+    uint8_t v = 0;
+    PIE3bits.RC1IE = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    TMR5_Initialize();
+    T5CONbits.TMR5ON = 1;
+    while(!PIR4bits.TMR5IF)
     {
-        if(U2STAbits.URXDA)
-        {//This detects and ignores rings 2\r\n or 3\r\n.
-            gsm_receive(1, gsmusm);
-            if(gsmusm[0] != '+')
+        if(EUSART1_is_rx_ready())
+        {
+            PIR3bits.RC1IF = 0;
+            msgadd[v] = EUSART1_Read();
+            T5CONbits.TMR5ON = 0;
+            TMR5_Initialize();
+            T5CONbits.TMR5ON = 1;
+            if(v < 128)
             {
-                gsmflags.msgavl = 0;
+                v++;
             }
             else
             {
-                gsmflags.msgavl = 1;
+                break;
             }
         }
     }
-    if(gsmflags.msgavl)
-    {
-//        lcd_string(gsmusm, line1);
-        parse_sms();
-        __asm__("NOP");
-    }
-//    INTCONbits.PEIE = 0;
-//    gsm_msg((uint8_t*)smstxt);
-//    gsm_receive(1);
-//    gsm_msg((uint8_t*)smslst);
- //   gsm_receive(71);
-    
- //   goto dispclka;
+    PIE3bits.RC1IE = 0;
+    INTCONbits.GIEH = 0;
+    INTCONbits.GIEL = 0;
+    msgadd[v] = 0;
+    return v;
 }
-
-void get_radio(void)
+uint8_t Read_timeout2(uint8_t *msgadd) //10ms timeout with interrupt read
 {
-    uint16_t x = 0;
-    uint16_t y = x;
-    gsm_zerobuff(gsmusd, 0x80);
-    gsmflags.eomsg = 1;
-    gsmflags.msggod = 1;
-    gsm_msg((uint8_t*)engqry);
-    gsm_receive(1, gsmusd);
-    while(gsmflags.eomsg)
+    uint8_t v = 0;
+    PIE3bits.RC1IE = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    TMR3_Initialize();
+    T3CONbits.TMR3ON = 1;
+    while(!PIR4bits.TMR3IF)
     {
-        gsmbyte = EUSARTG_Read();
-        gsmusd[x] = gsmbyte;
-        if(gsmbyte == 0x0A)
+        if(PIR3bits.RC1IF)
         {
-            y = x - 2;
-            if(gsmusd[y] == 0x30)
+            PIR3bits.RC1IF = 0;
+            msgadd[v] = RC1REG;
+            T3CONbits.TMR3ON = 0;
+            TMR3_Initialize();
+            T3CONbits.TMR3ON = 1;
+            if(v < 127)
             {
-                gsmflags.eomsg = 0;
+                v++;
             }
-            if(gsmflags.msggod)
-            {
-                gsm_msg((uint8_t*)engoff);
-                gsmflags.msggod = 0;
-            }
-        }
-        x++;
-        if(x > 0x1FF)
-        {
-            gsmflags.eomsg = 0;
+            
         }
     }
+    PIE3bits.RC1IE = 0;
+    INTCONbits.GIEH = 0;
+    INTCONbits.GIEL = 0;
+//    msgadd[v] = 0;
+    return v;
 }
 
-void sig_strength(void)
+void Read_SMS(void)
 {
-    while(gsmflags.sigtest)
-    {//((uint8_t*) &pnvcash)
-        uint32_t *convte;
-//        lcd_write(dispclr);
-        get_radio();
-//        lcd_dispadd(line2 + 4);
-        convte = gsmusd;
-        displ_hex(convte[5] & 0x00FFFF);
-    }
-}
-
-void check_num(void)
-{//int memcmp(const void *s1, const void *s2, size_t n);
-uint16_t pnindex = (gsmusm[0x0C] & 0x0F) * 2;
-    gsm_msg((uint8_t*)smstxt);
-    gsm_receive(1, gsmusd);
-    gsm_msg((uint8_t*)smslst);
-    gsm_receive(++pnindex, gsmusd);
-    gsmflags.msggod = 0;
-    //Phone number starts gsmusd[24]
-    int diffr = memcmp(gsmusd + 24, spnum, 0x0B);
-    if(diffr == 0x00)
+    led_switch(2);
+    Read_Service();
+ //   base64_encode("22d3cf4f-db05-4609-9773-2312375b4523:", (idx_t) 37, base64buf, (idx_t) 58);
+    __delay_ms(500);
+    gsm_msg(smstxt);//AT+CMGF=1 set text sms
+    gsm_receive(1, gsmtim);
+    gsm_msg(smsdel);//"AT+CMGDA=\"DEL ALL\"\r"
+    gsm_receive(1, gsmtim);
+//    price_set();
+    gsmflags.msgavl = 0;
+    PIE3bits.RC1IE = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    led_switch(2); //off
+    while(SERVICE_PORT)
     {
-        gsmflags.msggod = 1;
+        int_sms_notify();
     }
-    else
+    PIE3bits.RC1IE = 0;
+    uint8_t k = 0;
+    while(!k)
     {
-        gsm_msg((uint8_t*)smstxt);
-        gsm_receive(1, gsmusm);
-        gsm_msg((uint8_t*)smsdel);
-        gsm_receive(1, gsmtim);
-    }
-}
-
-void parse_sms(void)
-{
-    int diffr = memcmp(gsmusm, cmti, 0x05);
-    while(diffr == 0x00)
-    {
-        check_num();
-        if(!gsmflags.msggod)
+        uint8_t z = Long_Press();
+        switch(z)
         {
+            case 3 : k = 1;
             break;
+            case 2 : channel = 0;
+            dispense_test();
+            k = 1;
+            break;
+            case 1 : k = 0;
+            continue;
         }
-        gsm_msg((uint8_t*)setgsm);
-        gsm_receive(1, gsdate);
-        gsm_msg((uint8_t*)smstxt);
-        gsm_receive(1, gstime);
-        gsm_msg((uint8_t*)sendms);
-        gsm_msg((uint8_t*)pnum);
-        gsm_numack();
-        //if gsmflags.abrtmsg send call me instead
-        gsm_msg((uint8_t*)ackmsg);
-        //Send ^Z or SUB to terminate sms
-        gsm_transmit(0x1A);
-        gsm_transmit(0x0D);
-        gsm_receive(1, gsdate);
-        __asm__("NOP"); //gsm_receive(1, gsdate); needs to be fixed!
-        gsm_msg((uint8_t*)smstxt);
-        gsm_receive(1, gsmusm);
-        gsm_msg((uint8_t*)smsdel);
-        gsm_receive(1, gsmtim);
-        sms_report();
-        __asm__("NOP");
-        diffr = 0xFF;
     }
 }
-
-void start_sms(void)
-{
-    gsm_msg((uint8_t*)setgsm);
-    gsm_receive(1, gsmusd);
-    gsm_msg((uint8_t*)smstxt);
-    gsm_receive(1, gsmusd);
-    gsm_msg((uint8_t*)sendms);
-    gsm_msg((uint8_t*)pnum);
-    gsm_numack();
-    //if gsmflags.abrtmsg send call me instead
-}
-
-void gsm_numack(void)
-{
-    gsmbyte = 0x00;
-    uint8_t x = 4;
-    gsmflags.abrtmsg = 0;
+/*
+    gsm_msg(smstxt);
+    gsm_receive(1, gsmmsg);
     
-    while(x > 0)
-    {
-        gsmbyte = EUSARTG_Read();
-        if(gsmbyte == '4')
-        {
-            gsmflags.abrtmsg = 1;
-            break;
-        }
-        if(gsmbyte == '\"')
-        {
-            gsmflags.abrtmsg = 0;
-            break;
-        }
-        x--;
-    }
-}
-
-void sms_report(void)
-{
-/*    uint8_t i = 0;
-    uint8_t z = i;
+    gsm_msg(smsdel);
+    gsm_receive(1, gsmmsg);
+    
     gsm_getbalance();
-    gsm_gettime();
     
-    gsm_zerobuff(gsmusd, 0x200);
-    gsmusd[i] = 0x20;
-    //Read in "Date "
-    i = write_sms(i,clockdate);
-    //Read in actual date.
-    i = write_sms(i,gsdate);
-    gsmusd[i++] = 0x20;
-    //Things go wrong!
-    i = write_sms(i,clocktime);
-    i = write_sms(i,gstime);
-    gsmusd[i++] = 0x20;
-    gsmusd[i++] = ',';
-    gsmusd[i++] = 0x20;
-    gsmusd[i++] = 'R';
-//    Read_NVstore(cashinv, ((uint8_t*) &pvcash), 0x02);
-//    Read_NVstore(cashint, ((uint8_t*) &pnvcash), 0x03);
-//    uint8_t *gsmval = convert_hex((uint32_t) pvcash);
-    i = write_sms(i,gsmval);
-    gsmusd[i++] = ',';
-    gsmusd[i++] = 0x20;
-    gsmusd[i++] = 'R';
-//    gsmval = convert_hex(pnvcash);
-    i = write_sms(i,gsmval);
-    gsmusd[i++] = ',';
-//    i = write_sms(i, totalvendsm);
-    //Total vends
-//    uint16_t vendstores = vendstore;
-    for(char x = 0; x < 0x08; x++)
-    {
-        gsmusd[i++] = (x +1) | 0x30;
-        gsmusd[i++] = '=';
-//        gsmbyte = DATAEE_ReadByte(vendstores + x);
-        gsmval = convert_hex((uint32_t) gsmbyte);
-        i = write_sms(i,gsmval);
-        gsmusd[i++] = ',';
-    }
-    gsmusd[i++] = 0x20;
-    //Display change coins given
-//    i = write_sms(i,coinsout);
-//    Read_NVstore(cashoutv, ((uint8_t*) &pvcash), 0x02);
-//    gsmval = convert_hex((uint32_t) pvcash);
-    i = write_sms(i,gsmval);
-//    i = write_sms(i,coinvalu);
-//    gsmbyte = DATAEE_ReadByte(hopcoin);
-    gsmusd[i++] = gsmbyte | 0x30;
-    i = write_sms(i, gsmusd);
-    //Null string terminator
-    gsmusd[i] = 0x00;
-    start_sms();
-    //if gsmflags.abrtmsg send call me instead
-    if(gsmflags.abrtmsg)
-    {
-        
-    }
-    gsm_msg((uint8_t*)gsmums);
-    gsm_transmit(0x1A);
-    gsm_transmit(0x0D);*/
-}
-
-uint8_t write_sms(uint8_t i, uint8_t *msgpnt)
-{
-    uint8_t x = 0x00;
-    gsmbyte = 0x20;
-    while(gsmbyte != 0x00)
-    {
-        gsmbyte = msgpnt[x++];
-        gsmusd[i++] = gsmbyte;
-    }
-    return --i;
-}
-
-//Take a 24 bit hex value and convert it.
-// Return pointer to eight ASCII digits lsd first.
-uint8_t* convert_hex(uint32_t hexnum)
-{
-    signed char x = 0;
-    uint8_t value[8];
-    uint8_t xvalue[8];
-    uint32_t hexnumsave = hexnum;
-    while(hexnum > 0)
-    {
-        xvalue[x] = hexnum % 10;
-        hexnum /= 10;
-        xvalue[x] = xvalue[x] | 0x30;
-        x++;
-    }
-    //insert null string terminator
-    value[x--] = 0x00;
-    uint8_t y = 0;
-    while(x >= 0)
-    {
-        value[x--] = xvalue[y++];
-    }
+    gsm_msg(smslst);
+    gsm_receive(1,gsmmsg);
     
-        //In case hexnum is zero
-    if(hexnumsave == 0)
-    {
-       value[0] = 0x30;
-       value[1] = 0x00;
-    }
-    return value;
-
-}
-void parse_date_time(void)
-{
-    gsm_zerobuff(gsdate, 0x014);
-    gsm_zerobuff(gstime, 0x014);
-    uint8_t x = 8;
-    uint8_t i = 0x07;
-    //Adjust hour to SAST
-    gsmbyte = gsmusd[27];
-    gsmbyte = gsmbyte & 0x0F;
-    gsmbyte = gsmbyte/4;
-    uint8_t hour = (gsmusd[18] & 0x0F) + gsmbyte;
-    uint8_t hhour = gsmusd[17] & 0x0F;
-    if(hour > 9)
-    {
-        gsmusd[18] = 0x30;
-        gsmusd[17]++;
-        if(gsmusd[17] > 0x32)
-        {
-            gsmusd[17] = 0x30;
-        }
-        while(hour > 0x0A)
-        {
-            hour--;
-            gsmusd[18]++;
-        }
-    }
-    else
-    {
-        gsmusd[18] = hour | 0x30;
-    }
-    while(x < 0x10)
-    {
-        gsdate[i - 1] = gsmusd[x++];
-        gsdate[i--] = gsmusd[x++];
-        gsdate[--i] = gsmusd[x++];
-        i--;
-    }
-    i = 0;
-    while(i < 0x08)
-    {
-        gstime[i++] = gsmusd[x++];
-    }
-}
-
-void gsm_gettime(void)
-{
-    gsm_msg((uint8_t*)clockr);
+    gsm_msg(smdqry);
+    gsm_receive(1, gsmmsg);
     
-    gsm_receive(2,gsmusd);
-    parse_date_time();
-}
+    gsm_msg(engqry);
+    gsm_receive(2, gsmmsg);
+    
+    gsm_msg(netoff);
+    gsm_receive(2, gsmmsg);
+   
+    gsm_msg(facres);
+    gsm_receive(1, gsmmsg);
+    goto gsminit;
+    asm("nop");
+*/
+/*+CMGR: "REC UNREAD","+27820098372","","22/07/19,15:29:07+08"
+ùòèdc££KEY = 22d3cf4f-db05-4609-9773-2312375b4523:.Sent from 27766520007 from the my Vodacom app.Get 20 free sms per day.
+0*/
 
-//past first 0A to 0X0C spaces 
-void gsm_getbalance(void)
+int int_sms_notify(void)
 {
-    gsm_msg((uint8_t*)setgsm);
-    gsm_receive(1,gsmusd);
-    uint8_t x = 0x0C;
-    uint8_t y = 0x00;
-    gsmusd[y++] = ' ';
-    gsmflags.eomsg = 1;
-// For mtn each line remove 0x0A
-// Parse until 0A  0A
-    if(gsmflags.mtn)
+    
+    uint8_t* x;
+    int y = 0;
+    ClrWdt();
+    if(EUSART1_is_rx_ready())
     {
-        gsm_msg((uint8_t*)ussdwm);
-        gsm_receive(11,gsmusd);
-        gsmusd[y++] = gsmusd[x++];
-        while(gsmflags.eomsg)
+        if(gsmflags.msgavl) //Retrieve the message if set
         {
-            gsmbyte = gsmusd[x++];
-            if(gsmbyte == 0x0A)
-            {//Add 0x20 inplace of 0A
-                gsmusd[y++] = ',';
-                gsmusd[y++] = ' ';
-                gsmbyte = gsmusd[x++];
-                if(gsmbyte == 0x0A)
+            gsmflags.msgavl = 0;
+            y = gsmint_receive(gsmmsg);
+            if(y > 0)//if y > 0 then something has been received
+            {
+                y = 0;
+                PIE3bits.RC1IE = 0;
+                ClrWdt();
+                led_switch(0); //Green = price store
+                x = strstr(gsmmsg, "Setup,");// check for price set message
+                if(!x)//Not a setup message, check for merchant key
                 {
-                    gsmflags.eomsg = 0;
-                    gsmusd[y++] = 0x22;
-                    gsmbyte = 0x00;
+                    x = strstr(gsmmsg, "KEY = ");
+                    if(!x)// Not a merchant key either, delete and wait.
+                    {
+                        x = strstr(gsmmsg, "MID = ");
+                        if(x)
+                        {
+                            led_switch(1); //Red =  merchant id stored
+                            store_mid();
+                            while(SERVICE_PORT)
+                            {
+                                ClrWdt();
+                                led_switch(3);
+                            }
+                        }
+                        led_switch(2); //off
+                        gsm_msg(smsdel);//"AT+CMGDA=\"DEL ALL\"\r"
+                        gsm_receive(1, gsmtim);
+                        PIE3bits.RC1IE = 1;
+                    }
+                    else// is a merchant key
+                    {
+                        led_switch(1); //Red =  merchant key stored
+                        store_merchkey();
+                        while(SERVICE_PORT)
+                        {
+                            ClrWdt();
+                        }
+                        gsm_msg(smsdel);//"AT+CMGDA=\"DEL ALL\"\r"
+                        gsm_receive(1, gsmtim);
+                        __delay_ms(1000);
+                        PIE3bits.RC1IE = 1;
+                    }
+                }
+                else //Is a price set message
+                {
+                    
+                    price_set();
+                    gsm_msg(smsdel);//"AT+CMGDA=\"DEL ALL\"\r"
+                    gsm_receive(1, gsmtim);
+                    __delay_ms(1000);
+                    PIE3bits.RC1IE = 1;
                 }
             }
-            gsmusd[y++] = gsmbyte;
+        /*
+         * +CMGR: "REC UNREAD","+27766520007","Dave Plater","22/06/21,15:58:15+08"
+         * Setup, 1=50,2=43,3=40,4=30,5=20,6=10,7=15,8=25..0
+         * Setup, 1=0975,2=0975,3=1250,4=1190..
+         */
         }
-    }
-//For vodacom parse to first 0x0A
-    else
-    {
-        gsm_msg((uint8_t*)ussdwv);
-        gsm_receive(3,gsmusd);
-        gsmusd[y++] = gsmusd[x++];
-        while(gsmflags.eomsg)
+        else //Wait for unsolicited notification
         {
-            gsmbyte = gsmusd[x++];
-            if(gsmbyte == 0x0A)
+            ClrWdt();
+            y = gsmint_receive(gsmusd);
+            if(!y)
             {
-                gsmflags.eomsg = 0;
-                gsmusd[y++] = 0x22;
-                gsmbyte = 0x00;
+                y = strstr(gsmusd, "+CMTI"); //Make sure it's an sms notification
             }
-            gsmusd[y++] = gsmbyte;
         }
+        led_switch(2) ;       
     }
-    gsm_msg((uint8_t*)ussdwc);
-    gsm_receive(1,gsmusd);
+    if(y > 0)
+    {
+        gsm_msg("AT+CMGR=1\r");// 
+        gsmflags.msgavl = 1;
+    }
 }
 
-void gsm_setime(void)
+int gsmint_receive( uint8_t messagebuf[] )
 {
-    gsm_zerobuff(gsmusd, 0x200);
-    gsm_msg((uint8_t*)nettst);
-//    gsm_receive(5,gsmusd);
-    retry:
+    //TMR3 PIR4bits.TMR3IF T3CONbits.TMR3ON = 1;
+    TMR3_Initialize();
+    T3CONbits.TMR3ON = 1;
+    gsmflags.meerror = 0;
+    int x = 0;
     gsmbyte = 0;
-    uint8_t x = 0;
-    //Search for *
-    while(gsmbyte != '*')
+    while(!PIR4bits.TMR3IF)// If no data for 10mS then message receive complete
     {
-        gsmbyte = EUSARTG_Read();
-        if(gsmflags.meerror)
+        if(EUSART1_is_rx_ready()) //Receive buffer data present
         {
-            goto offnet;
+            gsmbyte = EUSART1_Read();
+            messagebuf[x] = gsmbyte;
+            x++;
+            TMR3_Initialize();
+            T3CONbits.TMR3ON = 1;
         }
     }
-    gsmbyte = EUSARTG_Read(); //P
-    gsmbyte = EUSARTG_Read(); //S
-    gsmbyte = EUSARTG_Read(); //U
-    if(gsmbyte != 'U')
-    {
-        goto retry;
-    }
-    while(gsmbyte != ':')
-    {
-        gsmbyte = EUSARTG_Read();
-    }
-    while(gsmbyte != '\n')
-    {
-        gsmbyte = EUSARTG_Read();
-        gsmusd[x++] = gsmbyte;
-    }
-    //In case of DST message.
-    delay_milli(5);
-
-
-    x = 0x03;
-    gsmtim[0] = '"';
-    uint8_t i = 0x01;
-    while(i < 0x09)
-    {
-        gsmtim[i] = gsmusd[x];
-        gsmtim[i+1] = gsmusd[x+1];
-        if(gsmusd[x+1] == ',')
-        {
-            gsmtim[i+1] = gsmusd[x];
-            gsmtim[i] = '0';
-            x--;
-        }
-        gsmtim[i+2] = '/';
-        i = i + 3;
-        x = x + 3;
-    }
-    gsmtim[i-1] = ',';
-    
-    
-    while(i < 0x11)
-    {
-        gsmtim[i] = gsmusd[x];
-        gsmtim[i+1] = gsmusd[x+1];
-        if(gsmusd[x+1] == ',')
-        {
-            gsmtim[i+1] = gsmusd[x];
-            gsmtim[i] = '0';
-            x--;
-        }
-        gsmtim[i+2] = ':';
-        i = i + 3;
-        x = x + 3;
-    }
-    //This should take us to time zone dec i
-    i--;
+    T3CONbits.TMR3ON = 0;
     x++;
-    gsmtim[i] = gsmusd[x];
-    gsmtim[i+1] = '0';
-    gsmtim[i+2] = gsmusd[x+1];
-    gsmtim[i+3] = '"';
-    gsmtim[i+4] = '\r';
-    gsmtim[i+5] = 0x00;
-    offnet:
-    gsm_msg((uint8_t*)netoff);
-    gsm_receive(1, gsmusd);
-    gsm_msg((uint8_t*)clockw);
-    gsm_msg((uint8_t*)gsmtim);
-    gsm_receive(1, gsmusd);
-    if(gsmusd[0] != '0')
-    {
-        LATDbits.LATD0 = 0;
-        abort();
-    }
-}
-//Receive unsolicited messages for 16 seconds
-//and return the number of newlines.
-uint8_t gsm_unsolic(void)
-{
-    gsm_zerobuff(gsmusd, 0x80);
-    uint8_t i = 1;
-    uint16_t x = 0;
-    uint8_t y = 0;
-    resttim:
-    TMR2_Initialize();
-    TMR2_Start();
-    while(!IFS0bits.T3IF && x < 0x200)
-    {
-        gsmusd[x] = gsm_Read();
-        if(gsmusd[x] == '\n')
-        {
-            y++;
-        }
-        x++;
-    }
-    if(i > 0)
-    {
-        i--;
-        goto resttim;
-    }
-    return y;
+    messagebuf[x] = 0;
+    return x;
 }
 
-void gsm_receive(uint8_t noofline, uint8_t *messagebuf)
+void gsm_receive(uint8_t noofline, uint8_t messagebuf[])
 {
+    gsmflags.meerror = 0;
     uint8_t x = 0;
     gsmbyte = 0;
     while(noofline > 0x00)
@@ -717,8 +562,9 @@ void gsm_receive(uint8_t noofline, uint8_t *messagebuf)
             noofline--;
         }
     }
+  //  x++;
     messagebuf[x] = 0;
- }
+}
 
 void gsm_txAT(void)
 {
@@ -726,100 +572,152 @@ void gsm_txAT(void)
     gsm_transmit('T');
 }
 
-//Turn on the gsm unit and initialize the 3 second startup timer.
-void gsm_on(void)
+//Turn on or off the gsm unit and initialize the 3 second startup timer.
+/*#define PWR_SetHigh()            do { LATDbits.LATD0 = 1; } while(0)
+#define PWR_SetLow()             do { LATDbits.LATD0 = 0; } while(0)
+*/
+uint8_t gsm_on(void)
 {
-    LATDbits.LATD0 = 1;
-//    IFS0CLR= 1 << _IFS0_T1IF_POSITION;
-//    T1CONbits.ON = 1;
+    rgsm_on:
+    gsm_msg("AT+CPOWD=0\n");
+    delay_10mS(400);//delay 4 seconds after power down
+    LATCbits.LATC3 = 0;
+    One_Second();//Hold PWR low for 1 second is actually 1.49 seconds
+    ClrWdt();
+    LATCbits.LATC3 = 1;
+    uint8_t x = Read_timeout1(gsmusd);
+//    gsm_receive(10, gsmusd);
+    return x;
+}
+
+void One_Second(void)
+{
+    T1CONbits.TMR1ON = 0;
+    TMR1_Initialize();
+    TMR1_WriteTimer(19036);//TMR1 1 sec = 0x86E8 = 34536; 19036 = 0x4A5C
+    T1CONbits.TMR1ON = 1;
+    while(!PIR4bits.TMR1IF){}
+    T1CONbits.TMR1ON = 0;
+    PIR4bits.TMR1IF = 0;
 }
 
 uint8_t gsm_Read(void)
 {
-    while(!U2STAbits.URXDA)
+    TMR6_Initialize();
+    T6CONbits.TMR6ON = 1;
+    while(!PIR3bits.RC1IF)
     {
-        if(IFS0bits.T5IF)
+        if(PIR4bits.TMR6IF)
         {
+            TMR6_Stop();
+            PIR4bits.TMR6IF = 0;
+            gsmflags.meerror = 1;
             break;
         }
     }
 
     
-    if(1 == U2STAbits.OERR)
+    if(1 == RC1STAbits.OERR)
     {
-        // EUSART2 error - restart
+        // EUSART1 error - restart
 
-        U2STAbits.OERR = 0; 
+        RC1STAbits.CREN = 0; 
+        RC1STAbits.CREN = 1; 
     }
 
-    return U2RXREG;
+    return RC1REG;
 }
 
 void gsm_off(void)
 {
-    LATDbits.LATD0 = 0;
+    gsm_msg("AT+CPOWD=0\n");
+    __delay_ms(500);
 }
 
 void gsm_netwait(void)
 {
-    gsmflags.meerror = 0;
     gsmbyte = 0;
     uint8_t x = 0;
     while(gsmbyte != 'S')
     {
         gsmbyte = EUSARTG_Read();
-        gsmusd[x++] = gsmbyte;
-        if(gsmflags.meerror)
-            break;
+        gsmmsg[x++] = gsmbyte;
     }
     while(gsmbyte != '\n')
     {
         gsmbyte = EUSARTG_Read();
-        gsmusd[x++] = gsmbyte;
-        if(gsmflags.meerror)
-            break;
+        gsmmsg[x++] = gsmbyte;
     }
 }
 
 uint8_t EUSARTG_Read(void)
 {
-//    TRISCbits.TRISC3 = 1;
-    uint32_t x = 0;
-    while(!U2STAbits.URXDA && x < 0xFFFF)
+/*    long long d = 0;//1048575 loops timeout
+    gsmflags.retransmit = 0;//    TRISCbits.TRISC3 = 1;*/
+    while(!PIR3bits.RC1IF/* && d <= 0xFFFFFF*/)
     {
-        if(x > 0xFFFFE)
+    /*    d++;
+        if(d >= 0xFFFFFF)
         {
-            gsmflags.meerror = 1;
-            break;
-        }
+            gsmflags.retransmit = 1; //Timeout happened
+            return 0;
+        }*/
     }
 //    TRISCbits.TRISC3 = 0;
 
     
-    if(U2STAbits.OERR)
+    if(RC1STAbits.OERR)
     {
-        // EUSART2 error - restart
+        // EUSART1 error - restart
 
-        U2STAbits.OERR = 0; 
+        RC1STAbits.CREN = 0; 
+        RC1STAbits.CREN = 1; 
     }
-
-    return U2RXREG;
+    return RC1REG;
 }
 
+void EUSARTG_Write(uint8_t txData)
+{
+    while(0 == PIR3bits.TX1IF)
+    {
+    }
 
-//PIR3bits.TX2IF -  EUSART2 Transmit Interrupt Flag bit
-//1 = The EUSART2 transmit buffer, TX2REG, is empty (cleared by writing TX2REG)
-//0 = The EUSART2 transmit buffer is full
+    TX1REG = txData;    // Write the data byte to the USART.
+}
 
-//&& TX2STAbits.TXEN -  Transmit Enable bit SREN/CREN bits of RCxSTA (Register 27-2) override TXEN in Sync mode.
+bool delay_10mS(uint16_t count)
+{
+    TMR3_Initialize();
+    T3CONbits.TMR3ON = 1;
+    PIR4bits.TMR3IF = 0;
+    while(count > 0)
+    {
+        if(PIR4bits.TMR3IF)
+        {
+            count--;
+            T3CONbits.TMR3ON = 0;
+            TMR3_Initialize();
+            T3CONbits.TMR3ON = 1;
+            PIR4bits.TMR3IF = 0;
+        }
+    }
+    return 1;
+}
+
+//PIR3bits.TX1IF -  EUSART1 Transmit Interrupt Flag bit
+//1 = The EUSART1 transmit buffer, TX1REG, is empty (cleared by writing TX1REG)
+//0 = The EUSART1 transmit buffer is full
+
+//&& TX1STAbits.TXEN -  Transmit Enable bit SREN/CREN bits of RCxSTA (Register 27-2) override TXEN in Sync mode.
 // 1 = Transmit enabled
 // 0 = Transmit disabled
 
-//TX2STAbits.TRMT -  Transmit Shift Register Status bit
+//TX1STAbits.TRMT -  Transmit Shift Register Status bit
 // 1 = TSR empty TSR = Tx shift reg
 // 0 = TSR full
 
-//U2STAbits.URXDA -  EUSART2 Receive Interrupt Flag bit
-//1 = The EUSART2 receive buffer, RC2REG, is full (cleared by reading RC2REG)
-//0 = The EUSART2 receive buffer is empty
+//PIR3bits.RC1IF -  EUSART1 Receive Interrupt Flag bit
+//1 = The EUSART1 receive buffer, RC1REG, is full (cleared by reading RC1REG)
+//0 = The EUSART1 receive buffer is empty
+
 

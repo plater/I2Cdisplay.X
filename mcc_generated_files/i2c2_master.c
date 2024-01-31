@@ -98,7 +98,7 @@ typedef struct
 } i2c2_status_t;
 
 static void I2C2_SetCallback(i2c2_callbackIndex_t idx, i2c2_callback_t cb, void *ptr);
-static void I2C2_Poller(void);
+static void I2C2_MasterIsr(void);
 static inline void I2C2_MasterFsm(void);
 
 /* I2C2 interfaces */
@@ -169,7 +169,7 @@ void I2C2_Initialize()
     SSP2STAT = 0x00;
     SSP2CON1 = 0x08;
     SSP2CON2 = 0x00;
-    SSP2ADD  = 0x15;
+    SSP2ADD  = 0x4F;
     SSP2CON1bits.SSPEN = 0;
 }
 
@@ -199,8 +199,10 @@ i2c2_error_t I2C2_Open(i2c2_address_t address)
         I2C2_Status.callbackTable[I2C2_TIMEOUT]=I2C2_CallbackReturnReset;
         I2C2_Status.callbackPayload[I2C2_TIMEOUT] = NULL;
         
+        I2C2_SetInterruptHandler(I2C2_MasterIsr);
         I2C2_MasterClearIrq();
         I2C2_MasterOpen();
+        I2C2_MasterEnableIrq();
         returnValue = I2C2_NOERR;
     }
     return returnValue;
@@ -238,7 +240,6 @@ i2c2_error_t I2C2_MasterOperation(bool read)
             I2C2_Status.state = I2C2_SEND_ADR_WRITE;
         }
         I2C2_MasterStart();
-        I2C2_Poller();
     }
     return returnValue;
 }
@@ -295,6 +296,11 @@ void I2C2_SetTimeoutCallback(i2c2_callback_t cb, void *ptr)
     I2C2_SetCallback(I2C2_TIMEOUT, cb, ptr);
 }
 
+void I2C2_SetInterruptHandler(void (* InterruptHandler)(void))
+{
+    MSSP2_InterruptHandler = InterruptHandler;
+}
+
 static void I2C2_SetCallback(i2c2_callbackIndex_t idx, i2c2_callback_t cb, void *ptr)
 {
     if(cb)
@@ -309,13 +315,9 @@ static void I2C2_SetCallback(i2c2_callbackIndex_t idx, i2c2_callback_t cb, void 
     }
 }
 
-static void I2C2_Poller(void)
+static void I2C2_MasterIsr()
 {
-    while(I2C2_Status.busy)
-    {
-        I2C2_MasterWaitForEvent();
-        I2C2_MasterFsm();
-    }
+    I2C2_MasterFsm();
 }
 
 static inline void I2C2_MasterFsm(void)
@@ -435,7 +437,6 @@ static i2c2_fsm_states_t I2C2_DO_RX_EMPTY(void)
             I2C2_MasterEnableRestart();
             return I2C2_SEND_RESTART_READ;
         case I2C2_CONTINUE:
-            // Avoid the counter stop condition , Counter is incremented by 1
             return I2C2_RX;
         default:
         case I2C2_STOP:
@@ -547,7 +548,7 @@ static inline bool I2C2_MasterOpen(void)
         SSP2STAT = 0x00;
         SSP2CON1 = 0x08;
         SSP2CON2 = 0x00;
-        SSP2ADD = 0x15;
+        SSP2ADD = 0x4F;
         SSP2CON1bits.SSPEN = 1;
         return true;
     }
@@ -616,6 +617,7 @@ static inline void I2C2_MasterClearBusCollision(void)
 {
     PIR3bits.BCL2IF = 0;
 }
+
 
 static inline bool I2C2_MasterIsRxBufFull(void)
 {

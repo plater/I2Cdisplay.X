@@ -21,21 +21,23 @@
 #include "mcc_generated_files/mcc.h"
 
 /*Start I2C communication*/
-void ssh1106_write(uint8_t pdata, uint8_t msize, uint8_t command)
+void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command)
 {
     uint8_t pD[8]; //I2C send/receive buffer
     uint8_t *idata;
     uint8_t  z, x, i ;
     uint16_t nCount, y, slaveTimeOut;
+    PIE3bits.SSP2IE = 1;
+    PIR3bits.SSP2IF = 0;
+    PIR3bits.BCL2IF = 0;
     pD[0] = command; //command is 0x00 and data is 0x40
     idata = pD;
     idata++;
     nCount = memcpy(idata, pdata, msize);
     msize++;
-    while(!I2C2_Open(I2CAdd)); // sit here until we get the bus..
-    I2C_Ready();
+    I2C2_WriteNBytes((i2c2_address_t)I2CAdd, idata, (size_t) msize);
     i = 0;
-    while(msize > 0)
+/*    while(msize > 0)
     {
         x = pD[i++];
         while(I2C_Write(x));
@@ -49,10 +51,44 @@ void ssh1106_write(uint8_t pdata, uint8_t msize, uint8_t command)
     else
     {
         NOP();//failure
+    }*/
+}
+#if 0
+void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
+{
+    I2C2_Open(I2CAdd);
+    uint8_t c = 0;
+    if(I2C_Start(I2CAdd))
+    {
+        while(len > 0)
+        {
+            I2C_Write(data[c]);
+            c++;
+            len--;
+        }
+        I2C_Stop();
+        NOP();
     }
 }
 
-#if 0
+
+    while(!I2C2_Open(address)); // sit here until we get the bus..
+    I2C2_SetBuffer(data,len);
+    I2C2_SetAddressNackCallback(NULL,NULL); //NACK polling?
+    I2C2_MasterWrite();
+    bussy:
+    if(!I2C2_Status.busy)
+    {
+        I2C2_Status.inUse = 0;
+        I2C2_Status.address = 0xff;
+        PIR3bits.SSP2IF = 0;
+        PIE3bits.SSP2IE = 0;
+        SSP2CON1bits.SSPEN = 0;
+    }
+    else
+    {
+        goto bussy;
+    }
 #define SLAVE_I2C_GENERIC_DEVICE_TIMEOUT 65535
 
 ssd1306_write(uint8_t *pdata, uint8_t msize, uint8_t command)

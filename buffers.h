@@ -40,6 +40,7 @@
    size, but it is so on all platforms we have seen since 1990.  */
 typedef ptrdiff_t idx_t;
 #include <proc/pic18f47k40.h>
+#include "mcc_generated_files/mcc.h"
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 
@@ -234,7 +235,9 @@ void Graphic_init(void);
 
 /** ***** I2C routines *****/
 
-void ssh1106_write(uint8_t pdata, uint8_t msize, uint8_t command);
+void I2C2_WriteNBytes(i2c2_address_t address, uint8_t *data, size_t len);
+
+void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command);
 
 bool I2C_Start(uint8_t slave_write_address);
 

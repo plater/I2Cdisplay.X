@@ -68,10 +68,13 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
+    RD3_SetDigitalOutput();
+    RD3_Toggle();
 
     while (1)
     {
-        // Add your application code
+        RD3_Toggle();
+        __delay_ms(10);// Add your application code
     }
 }
 /**

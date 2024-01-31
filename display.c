@@ -8,7 +8,6 @@
 #include "buffers.h"
 #include "display.h"
 #include "dispfont.h"
-#include "mcc_generated_files/examples/i2c2_master_example.h"
 #include "qrcodegen.h"
 
 //Lower and upper 4 bit column addresses added to 0x01 for upper and 0x0 for lower

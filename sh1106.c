@@ -29,13 +29,19 @@
 */
 bool I2C_Start(uint8_t slave_write_address)
 {   
-    SSP2CON2bits.SEN=1;		/* Send start pulse */
-    while(SSP2CON2bits.SEN);	/* Wait for completion of start pulse */
+    bool s = true;
+    SSP2CON2bits.SEN=s;		/* Send start pulse */
+    while(s)	/* Wait for completion of start pulse */
+    {
+        s = SSP2CON2bits.SEN;
+    }
     PIR3bits.SSP2IF=0;
-    if(!SSP2STATbits.S)		/* Check whether START detected last */
-    return 0;			/* Return 0 to indicate start failed */   
+    if(!SSP2STATbits.S)
+    {
+        return 0;			/* Return 0 to indicate start failed */
+    }		/* Check whether START detected last */
     return (I2C_Write(slave_write_address));	/* Write slave device address
-						with write to communicate */
+//						with write to communicate */
 }
 
  

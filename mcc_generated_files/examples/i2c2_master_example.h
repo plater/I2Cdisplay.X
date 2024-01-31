@@ -55,7 +55,7 @@ uint8_t  I2C2_Read1ByteRegister(i2c2_address_t address, uint8_t reg);
 uint16_t I2C2_Read2ByteRegister(i2c2_address_t address, uint8_t reg);
 void I2C2_Write1ByteRegister(i2c2_address_t address, uint8_t reg, uint8_t data);
 void I2C2_Write2ByteRegister(i2c2_address_t address, uint8_t reg, uint16_t data);
-void I2C2_WriteNBytes(i2c2_address_t address, uint8_t *data, size_t len);
+
 void I2C2_ReadNBytes(i2c2_address_t address, uint8_t *data, size_t len);
 void I2C2_ReadDataBlock(i2c2_address_t address, uint8_t reg, uint8_t *data, size_t len);
 

@@ -1,13 +1,12 @@
 
 
-#include "display.h"
+#include "buffers.h"
 #include "mcc_generated_files/mcc.h"
 #define SLAVE_I2C_GENERIC_DEVICE_TIMEOUT 65535
 
 I2C2_MESSAGE_STATUS ssd1306_write(uint8_t *pdata, uint8_t msize, uint8_t command)
 {
 //    uint8_t *pdata;
-    uint8_t pD[8]; //I2C send/receive buffer
     uint8_t *idata;
     uint8_t  z, x, i ;
     uint16_t nCount, y, slaveTimeOut;

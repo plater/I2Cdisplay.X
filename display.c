@@ -261,32 +261,31 @@ void Graphic_init(void)
 #else
 
 
-
 void Graphic_init(void)
 {
     uint8_t         *pData;
-    uint8_t         *DData;
     uint16_t        nCount;
     uint32_t        y, x;
-    uint8_t         z, i, msize ;
+    uint8_t         z, i, msize, c = 0 ;
 //    pD = INIT_SSD1306;
-    y = sizeof(INIT_SSD1306) + INIT_SSD1306; //Don't go further than the end of INIT_SSD1306
     //y--;
-    pData = INIT_SSD1306;
+    pData = memcpy(gsmmsg, INIT_SSD1306, 49);
     i = 0;
-    x = 0;
-    while(y > pData)
+    while(c < 18)
     {
         msize = *pData; //Load size of command string
-        pData++; //Next command
-        
-        while(msize > x)
+        pData++;
+        x = 0;
+        DData[x++] = 0; //Command
+        while(x <= msize)
         {
-            i = *pData;
-            SPI_write8bit(i);
-            x++;
+            DData[x] =  *pData; //Load data
             pData++;
+            x++;
         }
+        msize++;
+        I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
+        c++;
     } //end while(i <= x)
     y = y + z;
 }

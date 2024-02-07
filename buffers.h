@@ -235,11 +235,11 @@ void Graphic_init(void);
 
 /** ***** I2C routines *****/
 
-void I2C2_WriteNBytes(i2c2_address_t address, uint8_t *data, size_t len);
+void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len);
 
 void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command);
 
-bool I2C_Start(uint8_t slave_write_address);
+char I2C_Start(char slave_write_address);
 
 void I2C_Ready(void);
 

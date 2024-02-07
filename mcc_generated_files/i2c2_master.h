@@ -203,22 +203,4 @@ void I2C2_SetDataNackCallback(i2c2_callback_t cb, void *ptr);
  */
 void I2C2_SetTimeoutCallback(i2c2_callback_t cb, void *ptr);
 
-/**
- * \brief I2C2 Interrupt Handler
- *        This is a pointer to the function that will be called upon I2C2 interrupt
- * \param[in] None
- *
- * \return Nothing
- */
-void (*MSSP2_InterruptHandler)(void);
-
-/**
- * \brief Set I2C2 Interrupt Handler
- * This API sets the function to be called upon I2C2 interrupt
- * \param[in] None
- *
- * \return Nothing
- */
-void I2C2_SetInterruptHandler(void (* InterruptHandler)(void));
-
 #endif //I2C2_MASTER_H

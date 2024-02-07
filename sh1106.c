@@ -27,23 +27,16 @@
     Also, check S bit in SSP2STAT register which indicates the start bit is detected or not.
     And then send the device slave address along with write operation and check for acknowledgment signal.
 */
-bool I2C_Start(uint8_t slave_write_address)
+char I2C_Start(char slave_write_address)
 {   
-    bool s = true;
-    SSP2CON2bits.SEN=s;		/* Send start pulse */
-    while(s)	/* Wait for completion of start pulse */
-    {
-        s = SSP2CON2bits.SEN;
-    }
-    PIR3bits.SSP2IF=0;
-    if(!SSP2STATbits.S)
-    {
-        return 0;			/* Return 0 to indicate start failed */
-    }		/* Check whether START detected last */
+    SSP2CON2bits.SEN=1;		/* Send start pulse */
+    while(SSP2CON2bits.SEN);	/* Wait for completion of start pulse */
+    SSP2IF=0;
+    if(!SSP2STATbits.S)		/* Check whether START detected last */
+    return 0;			/* Return 0 to indicate start failed */   
     return (I2C_Write(slave_write_address));	/* Write slave device address
-//						with write to communicate */
+						with write to communicate */
 }
-
  
 
 /*Write/Transmit Data

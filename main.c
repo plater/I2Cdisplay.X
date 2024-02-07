@@ -56,7 +56,7 @@ void main(void)
     // Use the following macros to:
 
     // Enable the Global Interrupts
-    //INTERRUPT_GlobalInterruptEnable();
+//    INTERRUPT_GlobalInterruptEnable();
 
     // Disable the Global Interrupts
     //INTERRUPT_GlobalInterruptDisable();
@@ -68,12 +68,12 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
-    RD3_SetDigitalOutput();
-    RD3_Toggle();
+//    RD3_SetDigitalOutput();
+//    RD3_Toggle();
 
     while (1)
     {
-        RD3_Toggle();
+//        RD3_Toggle();
         __delay_ms(10);// Add your application code
     }
 }

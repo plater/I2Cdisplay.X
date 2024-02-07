@@ -12,11 +12,12 @@
 #define	DISPLAY_H
 
 #include "mcc_generated_files/mcc.h"
-//#include "gsm.h"
+//#include "mcc_generated_files/examples/i2c2_master_example.h"
 #include <string.h>
 #include <stddef.h>
 #include "buffers.h"
 
+static uint8_t DData[8];
 
 // +---------------------------+
 // |      Set MUX Ratio        |

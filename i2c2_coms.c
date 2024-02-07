@@ -23,19 +23,19 @@
 /*Start I2C communication*/
 void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command)
 {
-    uint8_t pD[8]; //I2C send/receive buffer
+//    uint8_t DData[8]; //I2C send/receive buffer
     uint8_t *idata;
     uint8_t  z, x, i ;
     uint16_t nCount, y, slaveTimeOut;
-    PIE3bits.SSP2IE = 1;
+/*    PIE3bits.SSP2IE = 1;
     PIR3bits.SSP2IF = 0;
-    PIR3bits.BCL2IF = 0;
-    pD[0] = command; //command is 0x00 and data is 0x40
-    idata = pD;
+    PIR3bits.BCL2IF = 0;*/
+    DData[0] = command; //command is 0x00 and data is 0x40
+    idata = DData;
     idata++;
     nCount = memcpy(idata, pdata, msize);
-    msize++;
-    I2C2_WriteNBytes((i2c2_address_t)I2CAdd, idata, (size_t) msize);
+    msize++; //Allow for command byte
+    I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
     i = 0;
 /*    while(msize > 0)
     {
@@ -53,10 +53,23 @@ void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command)
         NOP();//failure
     }*/
 }
+/**
+  */
+
+void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
+{
+    while(!I2C2_Open(address)); // sit here until we get the bus..
+    I2C2_SetBuffer(data,len);
+    I2C2_SetAddressNackCallback(NULL,NULL); //NACK polling?
+    I2C2_MasterWrite();
+    while(I2C2_BUSY == I2C2_Close()); // sit here until finished.
+}
+
+
 #if 0
 void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
 {
-    I2C2_Open(I2CAdd);
+ //   I2C2_Open(I2CAdd);
     uint8_t c = 0;
     if(I2C_Start(I2CAdd))
     {
@@ -70,7 +83,9 @@ void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
         NOP();
     }
 }
+#endif
 
+#if 0
 
     while(!I2C2_Open(address)); // sit here until we get the bus..
     I2C2_SetBuffer(data,len);
@@ -148,7 +163,6 @@ void PIC_i2c_write(uint8_t sdata, uint8_t msize, uint8_t command)
     }
     
 }
-
 #endif
 
 

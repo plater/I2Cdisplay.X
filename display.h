@@ -1,6 +1,6 @@
 /* 
  * File:   display.h
- * Author: dave Plater
+ * Author: Dave Plater
  * Copyright: Dave Plater 2020
  *
  * Created on February 24, 2020, 12:15 PM

@@ -1876,7 +1876,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="PMD" registerAlias="PMD4"/>
-         <value>0</value>
+         <value>16</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="PMD" registerAlias="PMD5"/>
@@ -1984,7 +1984,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="PMD" registerAlias="PMD4" settingAlias="MSSP1MD"/>
-         <value>MSSP1 enabled</value>
+         <value>MSSP1 disabled</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="PMD" registerAlias="PMD4" settingAlias="MSSP2MD"/>
@@ -2339,7 +2339,7 @@
          <value>enabled</value>
       </entry>
       <entry>
-         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T0CKIPPS%aux10"/>
+         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T0CKIPPS%aux8"/>
          <value>%DESELECT%</value>
       </entry>
       <entry>
@@ -2351,7 +2351,7 @@
          <value>%DESELECT%</value>
       </entry>
       <entry>
-         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T2INPPS%aux0"/>
+         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T2INPPS%aux7"/>
          <value>%DESELECT%</value>
       </entry>
       <entry>
@@ -2367,15 +2367,15 @@
          <value>%DESELECT%</value>
       </entry>
       <entry>
-         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T5CKIPPS%aux8"/>
+         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T5CKIPPS%aux9"/>
          <value>%DESELECT%</value>
       </entry>
       <entry>
-         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T5GPPS%aux9"/>
+         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T5GPPS%aux10"/>
          <value>%DESELECT%</value>
       </entry>
       <entry>
-         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T6INPPS%aux7"/>
+         <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="T6INPPS%aux0"/>
          <value>%DESELECT%</value>
       </entry>
       <entry>
@@ -8212,7 +8212,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="System Module" registerAlias="CONFIG3L"/>
-         <value>46</value>
+         <value>44</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="System Module" registerAlias="CONFIG4H"/>
@@ -8224,7 +8224,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="System Module" registerAlias="CONFIG5L"/>
-         <value>2</value>
+         <value>3</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="System Module" registerAlias="CONFIG6H"/>
@@ -8304,7 +8304,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG3L" settingAlias="WDTCPS"/>
-         <value>WDTCPS_14</value>
+         <value>WDTCPS_12</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG3L" settingAlias="WDTE"/>
@@ -8364,7 +8364,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG5L" settingAlias="CP"/>
-         <value>ON</value>
+         <value>OFF</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="System Module" registerAlias="CONFIG5L" settingAlias="CPD"/>
@@ -11164,7 +11164,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="WWDT" name="wwdtPeriod"/>
-         <value>16.91252</value>
+         <value>4.22813</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.OptionKey" moduleName="WWDT" registerAlias="PCON" settingAlias="nRWDT" alias="WDT reset has not occurred"/>
@@ -11210,7 +11210,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files/mcc.h</file>
-         <hash>01ed299189d9472d408a242d628f87fb7e67a46d8ddc974a683db930ba2033b2</hash>
+         <hash>88aca1ead9ffbce59223eacd3565c81cb98ecab55c953fcba1a9ee373d9712cc</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/eusart1.c</file>
@@ -11221,16 +11221,16 @@
          <hash>77795d2c146e847db74e56e69a8b65812e0eb3ff1c541c424846355152c0a4c3</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files/interrupt_manager.c</file>
-         <hash>321b4367e18418f6f54586063948ed6c0615ee52b247a5eda5c13855fce3a0f9</hash>
-      </entry>
-      <entry>
          <file>mcc_generated_files/examples/i2c2_master_example.c</file>
          <hash>3ce616b67891baded871abec26eb9b6ab98f7da3521925653b42ddc625677313</hash>
       </entry>
       <entry>
+         <file>mcc_generated_files/interrupt_manager.c</file>
+         <hash>321b4367e18418f6f54586063948ed6c0615ee52b247a5eda5c13855fce3a0f9</hash>
+      </entry>
+      <entry>
          <file>mcc_generated_files/mcc.c</file>
-         <hash>d76691f9efaf0f17c6c9bb2dc28554cc46914c35cf763603cfe8c49523683193</hash>
+         <hash>7d44d90caeeda124c7bf6faba8f94ab7e1cbf0ac69d9eb0ee4f0e52c3d8583fa</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/pin_manager.c</file>
@@ -11241,20 +11241,20 @@
          <hash>a63937f9821dc08a810389a0b7c4821f900d3361edc67e85c72b87c768e39338</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files/tmr0.c</file>
-         <hash>f6dbc760782754a6de22ec4cd284519becee411186efab0b9b930626cd7eefd3</hash>
-      </entry>
-      <entry>
          <file>mcc_generated_files/examples/i2c2_master_example.h</file>
          <hash>97f7a2eb2787eb1a2196e2d76e335471ee6f8ef7fa9c623c61681aa135c656c8</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files/tmr1.c</file>
-         <hash>2cc3ba199ae98a5c1465a22225d72b791609160b547eaeeff366ffb1a72db75f</hash>
+         <file>mcc_generated_files/tmr0.c</file>
+         <hash>f6dbc760782754a6de22ec4cd284519becee411186efab0b9b930626cd7eefd3</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/memory.h</file>
          <hash>702fd5780663e8f781722f9fed52286b3865833d13b26a674b9e7e2d3a62b558</hash>
+      </entry>
+      <entry>
+         <file>mcc_generated_files/tmr1.c</file>
+         <hash>2cc3ba199ae98a5c1465a22225d72b791609160b547eaeeff366ffb1a72db75f</hash>
       </entry>
       <entry>
          <file>main.c</file>
@@ -11297,12 +11297,12 @@
          <hash>4fd0ec44fea4de27c3e591b5e299fdb6cf723b8c438ad8e6bc1aa7212721b80f</hash>
       </entry>
       <entry>
-         <file>mcc_generated_files/tmr5.c</file>
-         <hash>e7cd8ed5fef50c30043d57080b6fca8d82a2c55ffb9be7335376c8f3c0ca62c5</hash>
-      </entry>
-      <entry>
          <file>mcc_generated_files/tmr0.h</file>
          <hash>fce63cf8aaa40a9ac622ee1fbb737cd25b70c91a857e4f8cdbd9453544eb738a</hash>
+      </entry>
+      <entry>
+         <file>mcc_generated_files/tmr5.c</file>
+         <hash>e7cd8ed5fef50c30043d57080b6fca8d82a2c55ffb9be7335376c8f3c0ca62c5</hash>
       </entry>
       <entry>
          <file>mcc_generated_files/device_config.h</file>
@@ -11318,7 +11318,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files/device_config.c</file>
-         <hash>3606c433a0de71e1f303664424c84e0fddf484ef281ded3ac4edd3b86023484c</hash>
+         <hash>2eb7d2a39a30965dd175598b4a815e0cce1dd5d14e4f64a4e1215fac1680d828</hash>
       </entry>
    </generatedFileHashHistoryMap>
 </config>

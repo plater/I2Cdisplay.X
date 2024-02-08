@@ -21,7 +21,7 @@
 #include "mcc_generated_files/mcc.h"
 
 /*Start I2C communication*/
-void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command)
+void ssh1106_write(uint8_t data, uint8_t msize, uint8_t command)
 {
 //    uint8_t DData[8]; //I2C send/receive buffer
     uint8_t *idata;
@@ -31,9 +31,8 @@ void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command)
     PIR3bits.SSP2IF = 0;
     PIR3bits.BCL2IF = 0;*/
     DData[0] = command; //command is 0x00 and data is 0x40
-    idata = DData;
-    idata++;
-    nCount = memcpy(idata, pdata, msize);
+    DData[1] = data;
+    DData[2] = 0;
     msize++; //Allow for command byte
     I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
     i = 0;

@@ -18,65 +18,6 @@
 #include "mcc_generated_files/mcc.h"
 #include <stdbool.h>
 
-/** Old constants from character lcd
-signed char count;
-//Message strings for 20x4 LCD
-const uint8_t clrline[] ="                    ";
-const uint8_t inscoin[] = "Insert Notes & PressLit Button To Vend" ;
-const uint8_t nochange[] = "No Change Use Exact      Amount!";
-const uint8_t credits[] = "  Credit = R";
-const uint8_t emptymsg[] = "No Stock";
-const uint8_t pricesetmsg[] = "   Price set mode";
-const uint8_t pricesetm2[] = "Press channel button    to set price      Service = Exit";
-const uint8_t vendsetup[] = "Push 1 Vend Time,   2 ChanLink 3 SensOff4 ClrTot 5 FacReset 8 exit";
-const uint8_t setimemsg[] = "Push channel button Push service to exit";
-const uint8_t sensoffms[] = "Hold channel button or Push service to  exit";
-const uint8_t vendtimem[] = "Push 1 = +.5 second Push 2 = -.5 second ";
-const uint8_t chanlinkm[] = "Press channel button    to link to      Service = Exit";
-const uint8_t linkmsg[] = "linked to :";
-const uint8_t chanmsg[] = "   Channel ";
-const uint8_t timemsg[] = "Time in 1/2sec = ";
-const uint8_t pricemsg[] = "Price R";
-const uint8_t priceexit[] ="Press service to exit";
-const uint8_t auditmsg[] = "  Audit Mode";
-const uint8_t hoppcoin[] = "Hopper Coin         Button 1 = + & 2 = - Value = R";
-const uint8_t senset[] = "  Setup Sensor";
-const uint8_t credclr[] = "Push button 1 to clear credits   and exit";
-const uint8_t vendtest[] = " Push button to     vend";
-const uint8_t notetest[] = "  Insert Note";
-//const uint8_t exit[] = "Exit";
-const uint8_t servmsg[] = "1 = Audit 2 = Sensor3=Hop-Coin 4=Note-en5=Cred-clr 6=Prices 7=Vend setup 8=Exit";
-const uint8_t noteerr[] = "   Note error     code = 0x";
-const uint8_t inithop[] = "  Initialize Hopper";
-const uint8_t initnote[] = "     Initialize          Note Reader";
-const uint8_t setnotes[] = "Enable / Disable    1 = R10, 2 = R20    3 = R50, 4 = R100   5 = R200";
-const uint8_t tenrand[] = "   R10  ";
-const uint8_t twentyrand[] = "  R20  ";
-const uint8_t fiftyrand[] = "  R50  ";
-const uint8_t hundredrand[] = "  R100 ";
-const uint8_t twohundredrand[] = "  R200 ";
-const uint8_t enabled[] = " enabled ";
-const uint8_t disabled[] = " disabled";
-const uint8_t creditclr[] = "Credits Cleared";
-const uint8_t sensmsg[] = "Sensor is ";
-const uint8_t onmsg[] = "On ";
-const uint8_t offmsg[] = "Off";
-const uint8_t clrmsg[] = "         ";
-const uint8_t dacmsg[] = "Sensitivity ";
-const uint8_t motimemsg[] = " Press Channel Vend Button or Press       Service to Exit";
-const uint8_t settimemsg[] = "Press 1 = + or 2 = -  Press 8 to Exit";
-const uint8_t chanlinkmsg[] = "Push Button to Link Push again to UnlinkPush Service to Exit";
-const uint8_t chanresetmsg[] = "Reset to Default    Start Again";
-const uint8_t sensoffmsg[] = "Push 1 = On, 2 = Off, 8 = Exit";
-const uint8_t totalmsg[] = "Total R";
-const uint8_t cashinmsg[] = "Cash in R";
-const uint8_t totalvendsm[] = "Vends ";
-const uint8_t vendispmsg[] = "Use button / Service";
-*/
-/*
-const uint8_t coinsout[] = "coins out ";
-const uint8_t coinvalu[] = " @ coin = R";
-*/
 
 //These define my fonts ascii codes on the right
 static const uint8_t font_fixed_8px_data[] = {

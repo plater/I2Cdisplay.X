@@ -70,7 +70,7 @@
 #pragma config XINST = OFF    // Extended Instruction Set Enable bit->Extended Instruction Set and Indexed Addressing Mode disabled
 
 // CONFIG3L
-#pragma config WDTCPS = WDTCPS_14    // WDT Period Select bits->Divider ratio 1:524299
+#pragma config WDTCPS = WDTCPS_12    // WDT Period Select bits->Divider ratio 1:131072
 #pragma config WDTE = SWDTEN    // WDT operating mode->WDT enabled/disabled by SWDTEN bit
 
 // CONFIG3H
@@ -95,7 +95,7 @@
 #pragma config LVP = ON    // Low Voltage Programming Enable bit->Low voltage programming enabled. MCLR/VPP pin function is MCLR. MCLRE configuration bit is ignored
 
 // CONFIG5L
-#pragma config CP = ON    // UserNVM Program Memory Code Protection bit->UserNVM code protection enabled
+#pragma config CP = OFF    // UserNVM Program Memory Code Protection bit->UserNVM code protection disabled
 #pragma config CPD = OFF    // DataNVM Memory Code Protection bit->DataNVM code protection disabled
 
 // CONFIG6L

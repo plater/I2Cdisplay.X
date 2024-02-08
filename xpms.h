@@ -33,10 +33,12 @@
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
-extern "C" {
+extern "C" { 
 #endif
 
-//chan1_R160.00.xpm
+static const uint8_t chan1a_txt[]  = "Channel 1";
+static const uint8_t chan1a_ptic[] = "Price R159.85";
+//channel 1_R160.00.xpm https://pos.snapscan.io/qr/CMMCyv0i?id=Chan1&amount=15985
 /* XPM */
 /* width height ncolors chars_per_pixel */
 //"41 41 2 1",

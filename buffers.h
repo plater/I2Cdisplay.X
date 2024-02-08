@@ -31,6 +31,11 @@
 #ifndef XC_HEADER_TEMPLATE_H
 #define	XC_HEADER_TEMPLATE_H
 
+#include <proc/pic18f47k40.h>
+#include "mcc_generated_files/mcc.h"
+#include <xc.h> // include processor files - each processor file is guarded. 
+
+
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
@@ -39,9 +44,6 @@
 /* Note: ISO C does not mandate that 'size_t' and 'ptrdiff_t' have the same
    size, but it is so on all platforms we have seen since 1990.  */
 typedef ptrdiff_t idx_t;
-#include <proc/pic18f47k40.h>
-#include "mcc_generated_files/mcc.h"
-#include <xc.h> // include processor files - each processor file is guarded.  
 
 
 #endif	//XC_HEADER_TEMPLATE_H
@@ -237,7 +239,7 @@ void Graphic_init(void);
 
 void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len);
 
-void ssh1106_write(uint8_t *pdata, uint8_t msize, uint8_t command);
+void ssh1106_write(uint8_t data, uint8_t msize, uint8_t command);
 
 char I2C_Start(char slave_write_address);
 

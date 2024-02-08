@@ -8,8 +8,7 @@
 #include "buffers.h"
 #include "display.h"
 #include "dispfont.h"
-#include "qrcodegen.h"
-
+#include "xpms.h"
 //Lower and upper 4 bit column addresses added to 0x01 for upper and 0x0 for lower
 //Sets the starting point on one of eight lines
 //Numbered from 0 to 136 with 8 x 8 bytes per font including spaces
@@ -349,7 +348,7 @@ void SPI_write8bit(uint8_t data)
 void SPI_write8bit(uint8_t data)
 {
     uint8_t command;
-    if(LATDbits.LATD5)
+    if(SS_A0_LAT)
     {
         command = 0x40; //Write graphic data
     }
@@ -357,7 +356,11 @@ void SPI_write8bit(uint8_t data)
     {
         command = 0; //Write command
     }
-    ssh1106_write(data, 1, command);
+    DData[0] = command;
+    DData[1] = data;
+    DData[2] = 0;
+    
+ I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) 2);
 }
 
 #endif //SPI_COMS
@@ -441,12 +444,22 @@ void Load_Qrcode(const uint8_t xpmname[])
     Write_Qrcode(xpmname);
 }
 
+Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
+{
+    ypos = xpos;
+    pagepos = ypost;
+    Set_Column(ypos);
+    Set_Page(pagepos);
+    Continue_String(xpmname);
+}
 
 //Position page 2 to 7 column 43
 //Display qrcode on screen.
 void Write_Qrcode(const uint8_t xpmname[])
 {
 	CS1_SetLow();
+    Qr_Text(chan1a_txt, 35, 0);
+    Qr_Text(chan1a_ptic, 24, 1);
 	ypos = 43;
 	pagepos = 2;
 	static uint16_t z, xpmlng, scrat, noline;
@@ -457,6 +470,7 @@ void Write_Qrcode(const uint8_t xpmname[])
 	uint16_t qrcount = 0;
     uint16_t l, zbu;
     uint8_t *e;
+    
     zbu=0;
     qrbyte = 0; // holds xpm pixel value
     xpmlng = strlen(xpmname);

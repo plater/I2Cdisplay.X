@@ -43,6 +43,7 @@
 
 #include "mcc_generated_files/mcc.h"
 #include "buffers.h"
+#include "xpms.h"
 /*
                          Main application
  */
@@ -51,6 +52,10 @@ void main(void)
     // Initialize the device
     SYSTEM_Initialize();
 
+#ifndef __DEBUG
+    WDTCON0bits.SEN = 1;
+#endif
+    ClrWdt();
     // If using interrupts in PIC18 High/Low Priority Mode you need to enable the Global High and Low Interrupts
     // If using interrupts in PIC Mid-Range Compatibility Mode you need to enable the Global and Peripheral Interrupts
     // Use the following macros to:
@@ -68,13 +73,37 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
+    while(SERVICE_GetValue())
+    {
+        ClrWdt();
+    }
+    while(!SERVICE_GetValue());
+    Graphic_Clear();
+    Write_Qrcode(chan1a_xpm);
+    while(SERVICE_GetValue())
+    {
+        ClrWdt();
+    }
+    while(!SERVICE_GetValue());
 //    RD3_SetDigitalOutput();
 //    RD3_Toggle();
 
     while (1)
     {
-//        RD3_Toggle();
-        __delay_ms(10);// Add your application code
+        Graphic_test();
+        while(SERVICE_GetValue())
+        {
+            ClrWdt();
+        }
+        while(!SERVICE_GetValue());
+        Graphic_Clear();
+        Write_Qrcode(chan1a_xpm);
+        while(SERVICE_GetValue())
+        {
+            ClrWdt();
+        }
+        while(!SERVICE_GetValue());
+        Graphic_Clear();
     }
 }
 /**

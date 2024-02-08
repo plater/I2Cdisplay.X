@@ -89,8 +89,8 @@ void PMD_Initialize(void)
     PMD2 = 0x00;
     // CCP2MD CCP2 enabled; CCP1MD CCP1 enabled; PWM4MD PWM4 enabled; PWM3MD PWM3 enabled; 
     PMD3 = 0x00;
-    // CWG1MD CWG1 enabled; UART2MD EUSART2 enabled; MSSP1MD MSSP1 enabled; UART1MD EUSART enabled; MSSP2MD MSSP2 enabled; 
-    PMD4 = 0x00;
+    // CWG1MD CWG1 enabled; UART2MD EUSART2 enabled; MSSP1MD MSSP1 disabled; UART1MD EUSART enabled; MSSP2MD MSSP2 enabled; 
+    PMD4 = 0x10;
     // DSMMD DSM enabled; 
     PMD5 = 0x00;
 }

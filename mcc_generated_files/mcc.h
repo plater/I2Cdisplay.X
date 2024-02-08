@@ -66,7 +66,7 @@
 
 #define WDTCWS  7
 #define WDTCCS  16
-#define WDTCPS  28
+#define WDTCPS  24
 
 
 /**

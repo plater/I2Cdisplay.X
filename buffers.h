@@ -48,6 +48,23 @@ typedef ptrdiff_t idx_t;
 
 #endif	//XC_HEADER_TEMPLATE_H
 
+#if 1
+/*const HEFregion[128] __at(0x1F80);*/
+/* XPM Flash storage */
+ __at(0x15400)
+extern const uint8_t Chan01_xpm[2816];
+ __at(0x15F00)
+extern const uint8_t Chan02_xpm[2816];
+ __at(0x16A00)
+extern const uint8_t Chan03_xpm[2816];
+ __at(0x17500)
+extern const uint8_t Chan04_xpm[2816];
+#endif    
+const uint8_t Chan01_xpm[2816];
+const uint8_t Chan02_xpm[2816];
+const uint8_t Chan03_xpm[2816];
+const uint8_t Chan04_xpm[2816];
+
     bool ledredflash;
     bool ledgreenflash;
     bool ledredon;

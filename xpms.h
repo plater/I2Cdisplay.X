@@ -35,7 +35,6 @@
 #ifdef __cplusplus
 extern "C" { 
 #endif
-
 static const uint8_t chan1a_txt[]  = "Channel 1";
 static const uint8_t chan1a_ptic[] = "Price R159.85";
 //channel 1_R160.00.xpm https://pos.snapscan.io/qr/CMMCyv0i?id=Chan1&amount=15985
@@ -46,6 +45,12 @@ static const uint8_t chan1a_ptic[] = "Price R159.85";
 //"F c #000000",
 //"B c #ffffff",
 /* pixels */
+//mediumconst  00E8BD
+//__end_of_chan1a_txt@xpms$F3551                  mediumconst  00F299
+//__end_of_chan1a_xpm                             mediumconst  00F250
+//_chan1a_xpm             MEDIUMCONST     E8BD    0000    2451
+//_chan1a_xpm@xpms$F3553          MEDIUMCONST     0000    0000    0
+//
 static const uint8_t chan1a_xpm[] = \
 "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBE"\
 "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBE"\

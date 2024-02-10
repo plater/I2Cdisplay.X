@@ -88,9 +88,9 @@ uint16_t csqval;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 //uint8_t mncbyte = 0;
 //gsm scratch pad
-uint8_t gsmmsg[512];
+uint8_t gsmmsg[1628];
 //sms storage
-uint8_t gsmums[512];
+uint8_t gsmums[128];
 //ussd storage
 uint8_t gsmusd[128];
 //Store unsolicited notifications
@@ -251,6 +251,8 @@ void Graphic_Clear(void);
 void Graphic_test(void);
 
 void Graphic_init(void);
+
+void Store_XPM(uint8_t xpmname[], uint8_t xpmstat[]);
 
 /** ***** I2C routines *****/
 

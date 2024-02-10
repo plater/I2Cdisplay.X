@@ -73,6 +73,7 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
+    Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())
     {
         ClrWdt();

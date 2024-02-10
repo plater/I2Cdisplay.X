@@ -227,13 +227,24 @@ void printQr(uint8_t qrcode[])
 /* pixels */
 //"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 //*/
-void Store_XPM(uint8_t *xpmname)
+void Store_XPM(uint8_t xpmname[], uint8_t xpmstat[])
 {
-    uint8_t x, y, z; //x = number of char and y = number of rows
-    x = atoi(xpmname);
-    y = atoi(xpmname + 3);
-    xpmname = strstr(xpmname, "BBBB");
-    z = xpmname[0];
+    uint8_t* srchst;
+    uint16_t v, w; //v = number of char and w = number of rows
+    uint16_t x, y, z;
+    v = atoi(xpmstat); //Characters per line or width
+    srchst = strchr(xpmstat, ' ');
+    w = atoi(++srchst); //Number of lines or hight
+    srchst = gsmmsg;
+    while(w > 0)
+    {
+        memcpy(srchst, xpmname, v);
+        srchst = (srchst + v);
+        srchst[0] = 'E';
+        srchst++;
+        xpmname = xpmname + v + 1;
+        w--;
+    }
 }
 
 void Load_Qrcode(const uint8_t xpmname[])

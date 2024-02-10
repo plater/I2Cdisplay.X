@@ -88,9 +88,9 @@ uint16_t csqval;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 //uint8_t mncbyte = 0;
 //gsm scratch pad
-uint8_t gsmmsg[1628];
+uint8_t gsmmsg[512];
 //sms storage
-uint8_t gsmums[128];
+uint8_t gsmums[512];
 //ussd storage
 uint8_t gsmusd[128];
 //Store unsolicited notifications

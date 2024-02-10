@@ -80,7 +80,7 @@ void main(void)
     }
     while(!SERVICE_GetValue());
     Graphic_Clear();
-    Write_Qrcode(chan1a_xpm);
+    Write_Qrcode(chan2_xpm);
     while(SERVICE_GetValue())
     {
         ClrWdt();
@@ -98,7 +98,7 @@ void main(void)
         }
         while(!SERVICE_GetValue());
         Graphic_Clear();
-        Write_Qrcode(chan1a_xpm);
+        Write_Qrcode(chan2_xpm);
         while(SERVICE_GetValue())
         {
             ClrWdt();

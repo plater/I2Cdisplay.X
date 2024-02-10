@@ -265,7 +265,7 @@ static const uint8_t INIT_SSD1306[] = {
   2, SSD1306_SET_PRECHARGE, 0xc2,
   // Set V COMH Deselect, reset value 0x22 = 0,77xUcc  18
   2, SSD1306_VCOM_DESELECT, 0x20,
-  // 0x8D 19
+  // 0x8D 19B",B",
   2, SSD1306_SET_CHAR_REG, 0x14,
   // 0xAF = Set Display ON 20
   1, SSD1306_DISPLAY_ON

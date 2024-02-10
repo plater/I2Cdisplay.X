@@ -52,18 +52,18 @@ typedef ptrdiff_t idx_t;
 /*const HEFregion[128] __at(0x1F80);*/
 /* XPM Flash storage */
  __at(0x15400)
-extern const uint8_t Chan01_xpm[2816];
+extern const uint8_t Chan01_xpm[1723];
  __at(0x15F00)
-extern const uint8_t Chan02_xpm[2816];
+extern const uint8_t Chan02_xpm[1723];
  __at(0x16A00)
-extern const uint8_t Chan03_xpm[2816];
+extern const uint8_t Chan03_xpm[1723];
  __at(0x17500)
-extern const uint8_t Chan04_xpm[2816];
+extern const uint8_t Chan04_xpm[1723];
 #endif    
-const uint8_t Chan01_xpm[2816];
-const uint8_t Chan02_xpm[2816];
-const uint8_t Chan03_xpm[2816];
-const uint8_t Chan04_xpm[2816];
+const uint8_t Chan01_xpm[1723];
+const uint8_t Chan02_xpm[1723];
+const uint8_t Chan03_xpm[1723];
+const uint8_t Chan04_xpm[1723];
 
     bool ledredflash;
     bool ledgreenflash;
@@ -88,14 +88,14 @@ uint16_t csqval;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 //uint8_t mncbyte = 0;
 //gsm scratch pad
-uint8_t gsmmsg[512];
+uint8_t gsmmsg[1723];
 //sms storage
-uint8_t gsmums[512];
+uint8_t gsmums[128];
 //ussd storage
 uint8_t gsmusd[128];
 //Store unsolicited notifications
-uint8_t gsmusm[128];
-uint8_t gsmtim[23];
+uint8_t gsmusm[64];
+uint8_t gsmtim[24];
 //Store date
 uint8_t gsdate[10];
 //Store time
@@ -106,8 +106,8 @@ uint8_t noofline;
 uint16_t index;
 
 
-uint8_t  gsmtim[23];
-uint8_t  qrbuffer[256];
+uint8_t  gsmtim[24];
+uint8_t  qrbuffer[64];
 char     base64buf[64];
 char     snap64buf[256];
 uint8_t  merchkey[40];
@@ -252,7 +252,7 @@ void Graphic_test(void);
 
 void Graphic_init(void);
 
-void Store_XPM(uint8_t xpmname[], uint8_t xpmstat[]);
+void Store_XPM(uint8_t *xpmname, uint8_t* xpmstat);
 
 /** ***** I2C routines *****/
 

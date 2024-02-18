@@ -28,10 +28,10 @@
 
 // This is a guard condition so that contents of this file are not included
 // more than once.  
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
+#ifndef BUFFERS_H
+#define	BUFFERS_H
 
-#include <proc/pic18f47k40.h>
+//#include <proc/pic18f47k40.h>
 #include "mcc_generated_files/mcc.h"
 #include <xc.h> // include processor files - each processor file is guarded. 
 
@@ -87,12 +87,14 @@ uint16_t csqval;
 //uint8_t gsmbyte =error: 0;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 //uint8_t mncbyte = 0;
+uint8_t * srchbuf0;
+uint8_t * srchbuf1;
 //gsm scratch pad
 uint8_t gsmmsg[1723];
 //sms storage
-uint8_t gsmums[128];
+uint8_t gsmums[64];
 //ussd storage
-uint8_t gsmusd[128];
+uint8_t gsmusd[384];
 //Store unsolicited notifications
 uint8_t gsmusm[64];
 uint8_t gsmtim[24];
@@ -196,7 +198,13 @@ uint8_t Read_timeout2(uint8_t *msgadd); //10ms timeout with interrupt read
 
 uint8_t get_csq(void);
 
+void gsm_init(bool inittype);
+
 void Display_csq(void);
+
+void Get_mms(void);
+
+void mms_init(void);
 
 int int_sms_notify(void);
 

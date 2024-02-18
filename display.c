@@ -199,7 +199,7 @@ void QRDisplay(uint8_t * xpmname)
     
 }
 
-void printQr(uint8_t qrcode[])
+/*void printQr(uint8_t qrcode[])
 {
     for(int i = 0; i < 1734; i++)
     {
@@ -216,7 +216,7 @@ void printQr(uint8_t qrcode[])
 	}
     qrbuffer[++blackb] = 0;
     Write_Qrcode(qrbuffer);
-}
+}*/
 /*/* XPM */
 //static const char *const chan1_xpm[] = {
 /* width height ncolors chars_per_pixel */
@@ -268,20 +268,20 @@ Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
 //Display qrcode on screen.
 void Write_Qrcode(const uint8_t xpmname[])
 {
-	CS1_SetLow();
-    Qr_Text(chan1a_txt, 35, 0);
-    Qr_Text(chan1a_ptic, 24, 1);
-	ypos = 43;
-	pagepos = 2;
 	static uint16_t z, xpmlng, scrat, noline;
-    z = 0;
     uint16_t x;
 	uint8_t qrbyte;
 	uint8_t linecount = 0;
-	uint16_t qrcount = 0;
-    uint16_t l, zbu;
+    uint16_t l, zbu, w;
     uint8_t *e;
+    uint8_t over;
     
+	CS1_SetLow();
+    Qr_Text(chan1a_txt, 34, 0);
+    Qr_Text(chan1a_ptic, 23, 1);
+	ypos = 42;
+	pagepos = 2;
+    z = 0;
     zbu=0;
     qrbyte = 0; // holds xpm pixel value
     xpmlng = strlen(xpmname);
@@ -289,43 +289,47 @@ void Write_Qrcode(const uint8_t xpmname[])
     l = e - xpmname;              //store it's value in l
     l++;
     noline = xpmlng / l;
+    w = noline;
 	SS_A0_SetHigh();
 	Set_Column(ypos);
 	Set_Page(pagepos);
+    over = 0;
 	readcode:;
 	uint8_t qbyte = 0; //qbyte holds raw graphic page value (page = 8 y bits)
 	for(x=0; x < 8; x++)
 	{
-        if(z >= xpmlng)
-        {
-            scrat = z - xpmlng;
-        }
 		qbyte = qbyte >> 1;
 		qrbyte = xpmname[z]; //z contains position from start of line
-        if(qrbyte == 0) // NULL string end
-        {
-            goto exitqr;
-        }
 		if(qrbyte == 'E')//End of line
 		{
-			Set_Column(43);
+			Set_Column(42);
 			Set_Page(++pagepos);
-			if(qrcount == 0)
-			{
-				qrcount = z + 1;
-			}
 			linecount = linecount + 8;
-			zbu = (linecount * qrcount); //go to next 8 rows +330
+            if(linecount >= noline)
+            {
+                goto exitqr;
+            }
+			zbu = (linecount * l); //go to next 8 rows +330
+            qrbyte = xpmname[++z];
+            if(qrbyte == 0) // NULL string end
+            {
+                NOP();
+                goto exitqr;
+            }
 			z = zbu;
+            if(z >= xpmlng)
+            {
+                goto exitqr;
+            }
 			goto readcode;
 		}
-		if(qrbyte == 'B')// B is black  F is white and E is end of line
-		{
-			qbyte = qbyte | 0x80;
-		}
-		else
+		if(qrbyte == 'F')// F is black  B is white and E is end of line
 		{
 			qbyte = qbyte & 0x7F;
+		}
+		else //qrbyte = F or any other value becomes black
+		{
+			qbyte = qbyte | 0x80;
 		}
 
 		z = z + l;
@@ -335,7 +339,8 @@ void Write_Qrcode(const uint8_t xpmname[])
 	z = ++zbu;
     if(z >= xpmlng)
     {
-        scrat = z - xpmlng;
+        NOP();
+        goto exitqr;
     }
 	goto readcode;
 

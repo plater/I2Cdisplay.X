@@ -73,14 +73,16 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
-    Store_XPM(qrcode1_xpm, qrstat1_xpm);
+    gsm_init(0);
+ //   Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())
     {
         ClrWdt();
     }
     while(!SERVICE_GetValue());
     Graphic_Clear();
-    Write_Qrcode(chan2_xpm);
+    Write_Qrcode(qrcode1_xpm);
+    Get_mms();
     while(SERVICE_GetValue())
     {
         ClrWdt();
@@ -98,7 +100,7 @@ void main(void)
         }
         while(!SERVICE_GetValue());
         Graphic_Clear();
-        Write_Qrcode(chan2_xpm);
+        Write_Qrcode(qrcode1_xpm);
         while(SERVICE_GetValue())
         {
             ClrWdt();

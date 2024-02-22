@@ -1,5 +1,6 @@
 /build/
 /dist/
-/nbproject/
+/private/
+
 /mcc_generated_files/examples/i2c2_master_example.c
 /mcc_generated_files/examples/i2c2_master_example.h

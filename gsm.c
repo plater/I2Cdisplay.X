@@ -79,13 +79,13 @@ void gsm_init(bool inittype)
         gsm_transmit(0x0D);
         gsm_receive(1, gsmusm);
         gsm_msg("AT&F\r");
-        x = Read_timeout1(gsmusd);
+        x = Read_timeout1(gsmusd, 64);
         gsm_msg("AT&F0\r");
-        x = Read_timeout1(gsmums);
+        x = Read_timeout1(gsmums, 64);
         gsm_msg("AT&V0\r");
-        x = Read_timeout1(gsmmsg);
+        x = Read_timeout1(gsmmsg, 64);
         gsm_msg("AT&V\r");
-        x = Read_timeout1(qrbuffer);
+        x = Read_timeout1(qrbuffer, 128);
         gsm_msg("AT&D0\r");
         gsm_receive(1, gsmusd);
         gsm_msg("AT+IPR=115200\r"); // 115200 or 57600 or 19200
@@ -236,23 +236,23 @@ Value 	RSSI dBm 	Condition
 */
 //#if 0
 /*    gsm_msg((uint8_t*)"AT+CANT?\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CEGPRS=1,2\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+ECHARGE?\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+ECHARGE=1\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+ECHARGE=0\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CBC\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CBATCHK?\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CBATCHK=1\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CBATCHK=0\r");
-    Read_timeout1(gsmmsg);
+    Read_timeout1(gsmmsg, 64);
     gsm_msg((uint8_t*)"AT+CBAND?\r");
     Read_timeout1(gsmmsg);
     gsm_msg((uint8_t*)"AT+CSDT?\r");//Switch on or off Detecting SIM Card
@@ -281,9 +281,9 @@ Value 	RSSI dBm 	Condition
  //#endif
 //Read until 3 second timeout for initialisation of network
 //return message count
-uint8_t Read_timeout1(uint8_t *msgadd)
+uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms)
 {
-    uint8_t v = 0;
+    uint16_t v = 0;
     PIE3bits.RC1IE = 1;
     INTCONbits.GIEH = 1;
     INTCONbits.GIEL = 1;
@@ -298,7 +298,7 @@ uint8_t Read_timeout1(uint8_t *msgadd)
             T5CONbits.TMR5ON = 0;
             TMR5_Initialize();
             T5CONbits.TMR5ON = 1;
-            if(v < 128)
+            if(v < lngmms)
             {
                 v++;
             }
@@ -314,37 +314,6 @@ uint8_t Read_timeout1(uint8_t *msgadd)
     msgadd[v] = 0;
     return v;
 }
-uint8_t Read_timeout2(uint8_t *msgadd) //10ms timeout with interrupt read
-{
-    uint8_t v = 0;
-    PIE3bits.RC1IE = 1;
-    INTCONbits.GIEH = 1;
-    INTCONbits.GIEL = 1;
-    TMR3_Initialize();
-    T3CONbits.TMR3ON = 1;
-    while(!PIR4bits.TMR3IF)
-    {
-        if(PIR3bits.RC1IF)
-        {
-            PIR3bits.RC1IF = 0;
-            msgadd[v] = RC1REG;
-            T3CONbits.TMR3ON = 0;
-            TMR3_Initialize();
-            T3CONbits.TMR3ON = 1;
-            if(v < 127)
-            {
-                v++;
-            }
-            
-        }
-    }
-    PIE3bits.RC1IE = 0;
-    INTCONbits.GIEH = 0;
-    INTCONbits.GIEL = 0;
-//    msgadd[v] = 0;
-    return v;
-}
-
 void Read_SMS(void)
 {
     //led_switch(2);
@@ -569,7 +538,7 @@ uint8_t gsm_on(void)
     One_Second();//Hold PWR low for 1 second is actually 1.49 seconds
     ClrWdt();
     PWR_LAT = 1;
-    uint8_t x = Read_timeout1(gsmusd);
+    uint8_t x = Read_timeout1(gsmusd, 128);
 //    gsm_receive(10, gsmusd);
     return x;
 }
@@ -688,6 +657,42 @@ bool delay_10mS(uint16_t count)
     return 1;
 }
 
+uint8_t Read_timeout2(uint8_t *msgadd,uint16_t lngmms ) //10ms timeout with interrupt read
+{
+    uint16_t v = 0;
+    PIE3bits.RC1IE = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    TMR5_Initialize();
+    TMR5_WriteTimer(0x1CF3);//15 second timeout
+    T5CONbits.TMR5ON = 1;
+    while(!PIR4bits.TMR5IF)
+    {
+        if(EUSART1_is_rx_ready())
+        {
+            PIR3bits.RC1IF = 0;
+            msgadd[v] = EUSART1_Read();
+            T5CONbits.TMR5ON = 0;
+            TMR5_Initialize();
+            TMR5_WriteTimer(0x1CF3);//15 second timeout
+            T5CONbits.TMR5ON = 1;
+            if(v < lngmms)
+            {
+                v++;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    PIE3bits.RC1IE = 0;
+    INTCONbits.GIEH = 0;
+    INTCONbits.GIEL = 0;
+    msgadd[v] = 0;
+    return v;
+}
+
 /*"AT+CMMSCURL=\"mmsc.monternet.com\""
  OK
  AT+CMMSCID=1
@@ -702,47 +707,134 @@ OK
 //DAILYASAP50
 void Get_mms(void)
 {
-     
- //   uint16_t ynot;
     mms_init();
+    gsm_msg("AT+CMGD=1,4\r");
+    gsm_receive(1, gsmusd);
+    repeatmms:
     while(SERVICE_GetValue())
     {
-        csqval = Read_timeout1(gsmusd);// look for +CMTI: "SM",3,"MMS PUSH"
+        csqval = Read_timeout1(gsmusd, 64);// look for +CMTI: "SM",3,"MMS PUSH"
         if(csqval > 6)
         {
-            srchbuf0 = strstr((const uint8_t)gsmusd, "+CMTI: ");
-            gsmbyte = *(srchbuf0 + 8);//gsmbyte now contains the index
+            srchbuf0 = strstr(gsmusd, "+CMTI: ");
+            if(!srchbuf0)
+            {
+                break;
+            }
+            mmsbyte = *(srchbuf0 + 8);//mmsbyte now contains the index
             gsm_msg("AT+CMMSRDPUSH=1\r");
-            csqval = Read_timeout1(gsmusd);
+            csqval = Read_timeout1(gsmusd, 383);
             srchbuf0 = strstr(gsmusd, "+CMMSRDPUSH:");
             if(srchbuf0)
             {
-                srchbuf1 = strstr(srchbuf0, ' ');
-                gsmbyte = atoi(srchbuf1 + 1);
+                credit = strlen(srchbuf0);
+                srchbuf1 = memchr(srchbuf0, 0x20, credit);
+                mmsbyte = atoi(srchbuf1 + 1); //mmsbyte now contains the message index
             }
-            gsm_msg("AT+CMMSDOWN=?\r");
-            csqval = Read_timeout1(gsmusd);
-            credit = csqval;
-            /*+CMMSRDPUSH: 2,
-            * "+27766520007","","0049010966022402171229402531001",
-            * "http://10.114.3.139:8080/was/00490109660224021712294025310                                                                                                                                                                                                                                                                 */
-            sprintf(gsmums, "AT+CMMSRECV=%d\r", gsmbyte);
+/* +CMTI: "SM",1,"MMS PUSH",2,1 use "PUSH," to get index
+   +CMTI: "SM",2,"MMS PUSH",2,2 Search 
++CMMSRECV: "+27766520007","2024-02-17,12:29:39","",2023
+1,"smil.xml",10,242
+2,"text_0.txt",4,168*/
+            memset(gsmusd, NULL, 383); 
+            sprintf(gsmums, "AT+CMMSRECV=%d\r", mmsbyte); //This takes 10 seconds maybe more
             gsm_msg(gsmums);
-            csqval = Read_timeout1(gsmusd);
+            csqval = Read_timeout2(gsmusd, 383);//<fileIndex,name,type,filesize>
+            srchbuf0 = strstr(gsmusd, "+CMMSRECV:");
+            if(srchbuf0)
+            {
+                srchbuf1 = strrchr(srchbuf0, ','); //Search for the last comma
+                srchbuf1++;
+                mmsbyte2 = atoi(srchbuf1); //mmsbyte now contains the file size to be used with read
+            }
             credit = csqval;
-            sprintf(gsmums, "AT+CMMSREAD=%d\r", gsmbyte);
+            memset(gsmmsg, NULL, 2048);
+            sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
-            csqval = Read_timeout1(gsmmsg);
-            credit = csqval;
-            gsm_msg("AT+AT+CMMSVIEW\r");
-            csqval = Read_timeout1(gsmmsg);
-            credit = csqval;
-            gsm_msg("AT+CMMSRDPUSH=1\r");
-            csqval = Read_timeout1(gsmusd);
-            credit = csqval;
-            gsm_msg("AT+CMMSREAD=1\r");
-            csqval = Read_timeout1(gsmmsg);
-            credit = csqval;
+            Read_themms(gsmmsg, mmsbyte2);
+            Store_themms(mmsbyte2);
+        }
+    }
+    goto repeatmms;
+}
+
+void Store_themms(uint16_t mmssize)
+{
+    int8_t z;
+    flashadd = Chan01_xpm;
+    while(flashadd <= Chan01_xpm + mmssize)
+    {
+        z = FLASH_WriteBlock(flashadd, srchbuf0);
+        if(z)
+        {
+            flashadd = Chan01_xpm + WRITE_FLASH_BLOCKSIZE;
+        }
+    }
+}
+
+void Read_themms(uint8_t* messbuf, uint16_t mmssize)
+{
+    uint16_t mmscnt = 0;
+    PIE3bits.RC1IE = 1;
+    INTCONbits.GIEH = 1;
+    INTCONbits.GIEL = 1;
+    TMR3_Initialize();
+    T3CONbits.TMR3ON = 1;
+    PIR4bits.TMR3IF = 0;
+    while(EUSART1_is_rx_ready() == false)
+    {
+        if(PIR4bits.TMR3IF)
+        {
+            TMR3_Initialize();
+            T3CONbits.TMR3ON = 1;
+            PIR4bits.TMR3IF = 0;
+            mmscnt++;
+            if(mmscnt > 5000)
+            {
+                break;
+            }
+        }
+    }
+    mmscnt = 0;
+    while(!PIR4bits.TMR3IF)
+    {
+        if(EUSART1_is_rx_ready())
+        {
+            gsmbyte = EUSART1_Read();
+            TMR3_Initialize();
+            T3CONbits.TMR3ON = 1;
+            PIR4bits.TMR3IF = 0;
+            PIR3bits.RC1IF = 0;
+            if(gsmbyte != NULL)
+            {
+                gsmmsg[mmscnt++] = gsmbyte;
+            }
+        }
+    }
+    T3CONbits.TMR3ON = 0;
+    PIE3bits.RC1IE = 0;// mmscnt   = total file size including header
+    INTCONbits.GIEH = 0;//mmsbyte2 = actual data size so mmscnt - mmsbyte2 = header size
+    INTCONbits.GIEL = 0;//add header size to gsmmsg and move to gsmmsg
+    srchbuf0 = strstr(gsmmsg, "/* XPM */");
+    srchbuf1 = memmove(gsmmsg, srchbuf0, mmscnt);
+    srchbuf0 = gsmmsg + mmsbyte2 + 1;
+    csqval = mmscnt - mmsbyte2;
+    memset(srchbuf0, NULL, csqval);
+}
+
+void convert_mms(void) //Remove message header and any null characters in the body
+{
+    srchbuf0 = memchr(gsmmsg, NULL, 64);//Locate first null character
+    srchbuf1 = memmove(gsmmsg, srchbuf0, mmsbyte2);//overwrite file header
+    mmsbyte = mmsbyte2;
+    uint16_t mmscnt = 0;
+    uint16_t gmmscnt = 0;
+    while(mmscnt < mmsbyte2)
+    {
+        gsmbyte = gsmmsg[mmscnt++];
+        if(gsmbyte != 0)
+        {
+            gsmmsg[gmmscnt++];
         }
     }
 }
@@ -772,8 +864,6 @@ void mms_init(void)
     gsm_msg("AT+CMMSEDIT=0\r");
     gsm_receive(1, gsmtim);
 }
-
-
 //PIR3bits.TX1IF -  EUSART1 Transmit Interrupt Flag bit
 //1 = The EUSART1 transmit buffer, TX1REG, is empty (cleared by writing TX1REG)
 //0 = The EUSART1 transmit buffer is full

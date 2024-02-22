@@ -73,11 +73,11 @@ void TMR5_Initialize(void)
     //CS LFINTOSC; 
     T5CLK = 0x04;
 
-    //TMR5H 104; 
-    TMR5H = 0x68;
+    //TMR5H 180; 
+    TMR5H = 0xB4;
 
-    //TMR5L 162; 
-    TMR5L = 0xA2;
+    //TMR5L 81; 
+    TMR5L = 0x51;
 
     // Clearing IF flag.
     PIR4bits.TMR5IF = 0;
@@ -85,8 +85,8 @@ void TMR5_Initialize(void)
     // Load the TMR value to reload variable
     timer5ReloadVal=(uint16_t)((TMR5H << 8) | TMR5L);
 
-    // CKPS 1:4; nT5SYNC synchronize; TMR5ON enabled; T5RD16 disabled; 
-    T5CON = 0x21;
+    // CKPS 1:8; nT5SYNC synchronize; TMR5ON enabled; T5RD16 disabled; 
+    T5CON = 0x31;
 }
 
 void TMR5_StartTimer(void)

@@ -50,20 +50,22 @@ typedef ptrdiff_t idx_t;
 
 #if 1
 /*const HEFregion[128] __at(0x1F80);*/
-/* XPM Flash storage */
+/* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
  __at(0x15400)
-extern const uint8_t Chan01_xpm[1723];
+extern const uint8_t Chan01_xpm[2048];
  __at(0x15F00)
-extern const uint8_t Chan02_xpm[1723];
+extern const uint8_t Chan02_xpm[2048];
  __at(0x16A00)
-extern const uint8_t Chan03_xpm[1723];
+extern const uint8_t Chan03_xpm[2048];
  __at(0x17500)
-extern const uint8_t Chan04_xpm[1723];
+extern const uint8_t Chan04_xpm[2048];
 #endif    
-const uint8_t Chan01_xpm[1723];
-const uint8_t Chan02_xpm[1723];
-const uint8_t Chan03_xpm[1723];
-const uint8_t Chan04_xpm[1723];
+const uint8_t Chan01_xpm[2048];
+const uint8_t Chan02_xpm[2048];
+const uint8_t Chan03_xpm[2048];
+const uint8_t Chan04_xpm[2048];
+uint32_t flashadd;
+
 
     bool ledredflash;
     bool ledgreenflash;
@@ -78,6 +80,8 @@ const uint8_t Chan04_xpm[1723];
 
 //Gsm related memory
 uint8_t gsmbyte;
+uint16_t mmsbyte;
+uint16_t mmsbyte2;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 uint8_t mncbyte;
 uint16_t credit;
@@ -89,8 +93,9 @@ uint16_t csqval;
 //uint8_t mncbyte = 0;
 uint8_t * srchbuf0;
 uint8_t * srchbuf1;
+uint8_t * srchbuf2;
 //gsm scratch pad
-uint8_t gsmmsg[1723];
+uint8_t gsmmsg[2048];
 //sms storage
 uint8_t gsmums[64];
 //ussd storage
@@ -192,9 +197,9 @@ uint8_t Read_timeoutg(uint8_t *msgadd);
 
 uint8_t Read_timeout(uint8_t *msgadd);
 
-uint8_t Read_timeout1(uint8_t *msgadd);
+uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms);
 
-uint8_t Read_timeout2(uint8_t *msgadd); //10ms timeout with interrupt read
+uint8_t Read_timeout2(uint8_t *msgadd,uint16_t lngmms ); //10ms timeout with interrupt read
 
 uint8_t get_csq(void);
 
@@ -204,7 +209,13 @@ void Display_csq(void);
 
 void Get_mms(void);
 
+void Read_themms(uint8_t* messbuf, uint16_t mmssize);
+
+void Store_themms(uint16_t mmssize);
+
 void mms_init(void);
+
+void convert_mms(void);
 
 int int_sms_notify(void);
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>com.microchip.mplab.nbide.embedded.makeproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/make-project/1">
+            <name>I2Cdisplay</name>
+            <creation-uuid>8287fef3-9529-402c-8018-d991e7a88d8e</creation-uuid>
+            <make-project-type>0</make-project-type>
+            <sourceEncoding>ISO-8859-1</sourceEncoding>
+            <c-extensions>c</c-extensions>
+            <cpp-extensions/>
+            <header-extensions>h</header-extensions>
+            <asminc-extensions/>
+            <make-dep-projects/>
+            <sourceRootList/>
+            <confList>
+                <confElem>
+                    <name>default</name>
+                    <type>2</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
+        </data>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>co</word>
+            <word>electronicwings</word>
+            <word>gsmbyte</word>
+            <word>http</word>
+            <word>https</word>
+            <word>mms</word>
+            <word>mmsc</word>
+            <word>ncolors</word>
+            <word>ptrdiff</word>
+            <word>smil</word>
+            <word>txt</word>
+            <word>vodacom</word>
+            <word>www</word>
+            <word>xml</word>
+            <word>za</word>
+        </spellchecker-wordlist>
+    </configuration>
+</project>

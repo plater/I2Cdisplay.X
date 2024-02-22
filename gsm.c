@@ -765,7 +765,7 @@ void Store_themms(uint16_t mmssize)
     while(flashadd <= Chan01_xpm + mmssize)
     {
         z = FLASH_WriteBlock(flashadd, srchbuf0);
-        if(z)
+        if(z == 0)
         {
             flashadd = Chan01_xpm + WRITE_FLASH_BLOCKSIZE;
         }

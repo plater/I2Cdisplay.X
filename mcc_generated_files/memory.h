@@ -13,12 +13,12 @@
   @Description
     This header file provides APIs for driver for MEMORY.
     Generation Information :
-        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.8
+        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.4
         Device            :  PIC18F47K40
-        Driver Version    :  2.0.2
+        Driver Version    :  2.01
     The generated drivers are tested against the following:
-        Compiler          :  XC8 2.36 and above
-        MPLAB             :  MPLAB X 6.00
+        Compiler          :  XC8 2.20 and above
+        MPLAB             :  MPLAB X 5.40
 *******************************************************************************/
 
 /*
@@ -217,62 +217,6 @@ int8_t FLASH_WriteBlock(uint32_t writeAddr, uint8_t *flashWrBufPtr);
 */
 void FLASH_EraseBlock(uint32_t baseAddr);
 
-/**
-  Section: Data EEPROM Module APIs
-*/
-
-/**
-  @Summary
-    Writes a data byte to Data EEPROM
-
-  @Description
-    This routine writes a data byte to given Data EEPROM location
-
-  @Preconditions
-    None
-
-  @Param
-    bAdd  - Data EEPROM location to which data to be written
-    bData - Data to be written to Data EEPROM location
-
-  @Returns
-    None
-
-  @Example
-    <code>
-    uint16_t dataeeAddr = 0x10;
-    uint8_t dataeeData = 0x55;
-
-    DATAEE_WriteByte(dataeeAddr, dataeeData);
-    </code>
-*/
-void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData);
-
-/**
-  @Summary
-    Reads a data byte from Data EEPROM
-
-  @Description
-    This routine reads a data byte from given Data EEPROM location
-
-  @Preconditions
-    None
-
-  @Param
-    bAdd  - Data EEPROM location from which data has to be read
-
-  @Returns
-    Data byte read from given Data EEPROM location
-
-  @Example
-    <code>
-    uint16_t dataeeAddr = 0x10;
-    uint8_t readData;
-
-    readData = DATAEE_ReadByte(dataeeAddr);
-    </code>
-*/
-uint8_t DATAEE_ReadByte(uint16_t bAdd);
 
 void MEMORY_Tasks(void);
 

@@ -13,12 +13,12 @@
   @Description
     This source file provides APIs for EUSART1.
     Generation Information :
-        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.8
+        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.4
         Device            :  PIC18F47K40
-        Driver Version    :  2.1.1
+        Driver Version    :  2.1.0
     The generated drivers are tested against the following:
-        Compiler          :  XC8 2.36 and above
-        MPLAB 	          :  MPLAB X 6.00
+        Compiler          :  XC8 2.20 and above
+        MPLAB 	          :  MPLAB X 5.40
 */
 
 /*
@@ -154,6 +154,7 @@ uint8_t EUSART1_Read(void)
     
     while(0 == eusart1RxCount)
     {
+        CLRWDT();
     }
 
     eusart1RxLastError = eusart1RxStatusBuffer[eusart1RxTail];
@@ -174,6 +175,7 @@ void EUSART1_Write(uint8_t txData)
 {
     while(0 == eusart1TxBufferRemaining)
     {
+        CLRWDT();
     }
 
     if(0 == PIE3bits.TX1IE)

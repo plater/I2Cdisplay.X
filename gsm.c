@@ -758,18 +758,22 @@ void Get_mms(void)
     goto repeatmms;
 }
 
-void Store_themms(uint16_t mmssize)
+void Store_themms(uint16_t mmssize) //mmssize stores the file size
 {
+    #if 1
     int8_t z;
+    srchbuf0 = gsmmsg;
     flashadd = Chan01_xpm;
     while(flashadd <= Chan01_xpm + mmssize)
     {
         z = FLASH_WriteBlock(flashadd, srchbuf0);
+        csqval = FLASH_ReadWord(flashadd);
         if(z == 0)
         {
             flashadd = Chan01_xpm + WRITE_FLASH_BLOCKSIZE;
         }
     }
+    #endif
 }
 
 void Read_themms(uint8_t* messbuf, uint16_t mmssize)

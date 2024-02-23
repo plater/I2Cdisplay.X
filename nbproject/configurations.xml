@@ -224,8 +224,6 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-1ffff"/>
-        <property key="programmerToGoFilePath"
-                  value="/home/davepl/MPLABXProjects/I2Cdisplay.X/debug/default/I2Cdisplay_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.pgmentry.voltage" value="low"/>
@@ -235,7 +233,7 @@
                   value="${memories.dataflash.default}"/>
         <property key="programoptions.preserveeeprom" value="true"/>
         <property key="programoptions.preserveeeprom.ranges" value="310000-3103ff"/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value="15400-17CFF"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.programcalmem" value="false"/>
         <property key="programoptions.programuserotp" value="false"/>
@@ -310,7 +308,7 @@
                   value="${memories.dataflash.default}"/>
         <property key="programoptions.preserveeeprom" value="true"/>
         <property key="programoptions.preserveeeprom.ranges" value="310000-3103ff"/>
-        <property key="programoptions.preserveprogram.ranges" value=""/>
+        <property key="programoptions.preserveprogram.ranges" value="15400-17CFF"/>
         <property key="programoptions.preserveprogramrange" value="false"/>
         <property key="programoptions.programcalmem" value="false"/>
         <property key="programoptions.programuserotp" value="false"/>

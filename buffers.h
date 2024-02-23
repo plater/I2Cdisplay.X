@@ -48,22 +48,23 @@ typedef ptrdiff_t idx_t;
 
 #endif	//XC_HEADER_TEMPLATE_H
 
-#if 1
+
 /*const HEFregion[128] __at(0x1F80);*/
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
- __at(0x15400)
+ __at(0x2000)
 extern const uint8_t Chan01_xpm[2048];
- __at(0x15F00)
+ __at(0x2800)
 extern const uint8_t Chan02_xpm[2048];
- __at(0x16A00)
+ __at(0x3000)
 extern const uint8_t Chan03_xpm[2048];
- __at(0x17500)
+ __at(0x3800)
 extern const uint8_t Chan04_xpm[2048];
-#endif    
+#if 1    
 const uint8_t Chan01_xpm[2048];
 const uint8_t Chan02_xpm[2048];
 const uint8_t Chan03_xpm[2048];
 const uint8_t Chan04_xpm[2048];
+#endif
 uint32_t flashadd;
 
 

@@ -13,12 +13,12 @@
   @Description
     This source file provides APIs for TMR5.
     Generation Information :
-        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.8
+        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.4
         Device            :  PIC18F47K40
         Driver Version    :  2.11
     The generated drivers are tested against the following:
-        Compiler          :  XC8 2.36 and above
-        MPLAB 	          :  MPLAB X 6.00
+        Compiler          :  XC8 2.20 and above
+        MPLAB 	          :  MPLAB X 5.40
 */
 
 /*
@@ -125,8 +125,8 @@ void TMR5_WriteTimer(uint16_t timerVal)
         T5CONbits.TMR5ON = 0;
 
         // Write to the Timer5 register
-        TMR5H = (uint8_t)(timerVal >> 8);
-        TMR5L = (uint8_t)timerVal;
+        TMR5H = (timerVal >> 8);
+        TMR5L = timerVal;
 
         // Start the Timer after writing to the register
         T5CONbits.TMR5ON =1;
@@ -134,8 +134,8 @@ void TMR5_WriteTimer(uint16_t timerVal)
     else
     {
         // Write to the Timer5 register
-        TMR5H = (uint8_t)(timerVal >> 8);
-        TMR5L = (uint8_t)timerVal;
+        TMR5H = (timerVal >> 8);
+        TMR5L = timerVal;
     }
 }
 

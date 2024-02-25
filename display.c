@@ -171,7 +171,7 @@ void Graphic_init(void)
             x++;
         }
         msize++;
-        I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
+        myI2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
         c++;
     } //end while(i <= x)
     y = y + z;
@@ -191,7 +191,7 @@ void SPI_write8bit(uint8_t data)
     DData[1] = data;
     DData[2] = 0;
     
- I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) 2);
+ myI2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) 2);
 }
 
 void QRDisplay(uint8_t * xpmname)

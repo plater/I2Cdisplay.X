@@ -73,7 +73,7 @@ void main(void)
     //INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
-    gsm_init(0);
+    //gsm_init(0);
  //   Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())
     {
@@ -82,6 +82,7 @@ void main(void)
     while(!SERVICE_GetValue());
     Graphic_Clear();
     Write_Qrcode(qrcode1_xpm);
+    Test_pfm();
     Get_mms();
     while(SERVICE_GetValue())
     {

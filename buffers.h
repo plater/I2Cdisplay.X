@@ -51,6 +51,7 @@ typedef ptrdiff_t idx_t;
 
 /*const HEFregion[128] __at(0x1F80);*/
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
+#define BUF_SIZE 2048
  __at(0x2000)
 extern const uint8_t Chan01_xpm[2048];
  __at(0x2800)
@@ -65,8 +66,8 @@ const uint8_t Chan02_xpm[2048];
 const uint8_t Chan03_xpm[2048];
 const uint8_t Chan04_xpm[2048];
 #endif
-uint32_t flashadd;
-
+;
+uint8_t gsmmsg[2048];
 
     bool ledredflash;
     bool ledgreenflash;
@@ -96,11 +97,11 @@ uint8_t * srchbuf0;
 uint8_t * srchbuf1;
 uint8_t * srchbuf2;
 //gsm scratch pad
-uint8_t gsmmsg[2048];
+
 //sms storage
 uint8_t gsmums[64];
 //ussd storage
-uint8_t gsmusd[384];
+uint8_t gsmusd[192];
 //Store unsolicited notifications
 uint8_t gsmusm[64];
 uint8_t gsmtim[24];
@@ -210,9 +211,13 @@ void Display_csq(void);
 
 void Get_mms(void);
 
+void Test_pfm(void);
+
 void Read_themms(uint8_t* messbuf, uint16_t mmssize);
 
-void Store_themms(uint16_t mmssize);
+void Store_themms(uint16_t mmssize, uint32_t flashadd);
+
+bool MyFLASH_WriteBlock(uint32_t writeAddr, uint8_t *flashWrBufPtr);
 
 void mms_init(void);
 
@@ -276,7 +281,7 @@ void Store_XPM(uint8_t *xpmname, uint8_t* xpmstat);
 
 /** ***** I2C routines *****/
 
-void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len);
+void myI2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len);
 
 void ssh1106_write(uint8_t data, uint8_t msize, uint8_t command);
 

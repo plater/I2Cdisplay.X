@@ -34,7 +34,7 @@ void ssh1106_write(uint8_t data, uint8_t msize, uint8_t command)
     DData[1] = data;
     DData[2] = 0;
     msize++; //Allow for command byte
-    I2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
+    myI2C2_WriteNBytes((i2c2_address_t)I2CAdd, DData, (size_t) msize);
     i = 0;
 /*    while(msize > 0)
     {
@@ -55,7 +55,7 @@ void ssh1106_write(uint8_t data, uint8_t msize, uint8_t command)
 /**
   */
 
-void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
+void myI2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
 {
     while(!I2C2_Open(address)); // sit here until we get the bus..
     I2C2_SetBuffer(data,len);
@@ -66,7 +66,7 @@ void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
 
 
 #if 0
-void I2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
+void myI2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len)
 {
  //   I2C2_Open(I2CAdd);
     uint8_t c = 0;

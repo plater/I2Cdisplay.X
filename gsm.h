@@ -12,7 +12,7 @@
 extern "C" {
 #endif
     
-
+#include "xpms.h"
 #include "buffers.h"
 #include <stdio.h>
 #include <xc.h>

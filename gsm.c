@@ -752,28 +752,95 @@ void Get_mms(void)
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
             Read_themms(gsmmsg, mmsbyte2);
-            Store_themms(mmsbyte2);
+            Store_themms(mmsbyte2, Chan01_xpm);
         }
     }
     goto repeatmms;
 }
 
-void Store_themms(uint16_t mmssize) //mmssize stores the file size
+void Test_pfm(void)
+{
+    mmsbyte2 = (strlen(mms_xpm)) + 2;
+    srchbuf0 = memcpy(gsmmsg, mms_xpm, mmsbyte2);
+    Store_themms(mmsbyte2, Chan01_xpm);
+}
+
+void Store_themms(uint16_t mmssize, uint32_t flashadd) //mmssize stores the file size
 {
     #if 1
     int8_t z;
+    uint16_t tblocksz;
+    uint16_t tblock = 0;
+    uint32_t fflashadd;
+    fflashadd = flashadd;
     srchbuf0 = gsmmsg;
-    flashadd = Chan01_xpm;
-    while(flashadd <= Chan01_xpm + mmssize)
+    tblocksz = mmssize / WRITE_FLASH_BLOCKSIZE;
+    tblocksz++;  //Contains the number of blocks needed
+    if(tblocksz > (BUF_SIZE / WRITE_FLASH_BLOCKSIZE)) //If file too big
     {
-        z = FLASH_WriteBlock(flashadd, srchbuf0);
-        csqval = FLASH_ReadWord(flashadd);
+        tblocksz = (BUF_SIZE / WRITE_FLASH_BLOCKSIZE);//Truncate it.
+    }
+    while(tblock <= tblocksz)
+    {
+        FLASH_EraseBlock(fflashadd);
+        PIR7bits.NVMIF = 0;
+        z = MyFLASH_WriteBlock(fflashadd, srchbuf0);
         if(z == 0)
         {
-            flashadd = Chan01_xpm + WRITE_FLASH_BLOCKSIZE;
+            fflashadd = flashadd + WRITE_FLASH_BLOCKSIZE;
+            srchbuf0 = srchbuf0 + WRITE_FLASH_BLOCKSIZE;
+            tblock++;
         }
     }
     #endif
+}
+
+bool MyFLASH_WriteBlock(uint32_t writeAddr, uint8_t *flashWrBufPtr)
+{
+    uint8_t i;
+    uint8_t GIEBitValue = INTCONbits.GIE;
+    
+        // Block write sequence
+    TBLPTRU = (uint8_t)((writeAddr & 0x00FF0000) >> 16);    // Load Table point register
+    TBLPTRH = (uint8_t)((writeAddr & 0x0000FF00)>> 8);
+    TBLPTRL = (uint8_t)(writeAddr & 0x000000FF);
+
+    // Write block of data
+    for (i=0; i<WRITE_FLASH_BLOCKSIZE; i++)
+    {
+        TABLAT = flashWrBufPtr[i];  // Load data byte
+
+        if (i == (WRITE_FLASH_BLOCKSIZE-1))
+        {
+            asm("TBLWT*");
+        }
+        else
+        {
+            asm("TBLWT*+");
+        }
+
+        CLRWDT();
+    }
+    TBLPTRU = (uint8_t)((writeAddr & 0x00FF0000) >> 16);    // Load Table point register
+    TBLPTRH = (uint8_t)((writeAddr & 0x0000FF00)>> 8);
+    TBLPTRL = (uint8_t)(writeAddr & 0x000000FF);
+    NVMCON1bits.NVMREG = 2;
+    NVMCON1bits.WREN = 1;
+	INTCONbits.GIE = 0; // Disable interrupts
+    NVMCON2 = 0x55;
+    NVMCON2 = 0xAA;
+    NVMCON1bits.WR = 1;  // Start program
+    Nop();
+    Nop();
+    Nop();
+    while(NVMCON1bits.WR);
+    NVMCON1bits.WREN = 0;    // Disable writes to memory
+    
+    while(!PIR7bits.NVMIF);
+    PIR7bits.NVMIF = 0;
+	INTCONbits.GIE = GIEBitValue;   // Restore interrupt enable
+    
+    return (NVMCON1bits.WRERR);
 }
 
 void Read_themms(uint8_t* messbuf, uint16_t mmssize)

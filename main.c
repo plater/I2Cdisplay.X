@@ -64,7 +64,7 @@ void main(void)
 //    INTERRUPT_GlobalInterruptEnable();
 
     // Disable the Global Interrupts
-    //INTERRUPT_GlobalInterruptDisable();
+    INTERRUPT_GlobalInterruptDisable();
 
     // Enable the Peripheral Interrupts
     //INTERRUPT_PeripheralInterruptEnable();

@@ -51,7 +51,8 @@ typedef ptrdiff_t idx_t;
 
 /*const HEFregion[128] __at(0x1F80);*/
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
-#define BUF_SIZE 2048
+#define BUF_SIZE          2048
+#define XPM_HEADER_SIZE   124  //This is the size of the XPM's header
  __at(0x2000)
 extern const uint8_t Chan01_xpm[2048];
  __at(0x2800)

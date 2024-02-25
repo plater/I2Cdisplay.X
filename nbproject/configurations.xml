@@ -70,6 +70,7 @@
       <itemPath>sh1106.c</itemPath>
       <itemPath>i2c2_coms.c</itemPath>
       <itemPath>gsm.c</itemPath>
+      <itemPath>mms.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

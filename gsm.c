@@ -787,9 +787,10 @@ void Store_themms(uint16_t mmssize, uint32_t flashadd) //mmssize stores the file
         z = MyFLASH_WriteBlock(fflashadd, srchbuf0);
         if(z == 0)
         {
-            fflashadd = flashadd + WRITE_FLASH_BLOCKSIZE;
-            srchbuf0 = srchbuf0 + WRITE_FLASH_BLOCKSIZE;
             tblock++;
+            fflashadd = fflashadd + WRITE_FLASH_BLOCKSIZE;
+            srchbuf0 = srchbuf0 + WRITE_FLASH_BLOCKSIZE;
+            
         }
     }
     #endif

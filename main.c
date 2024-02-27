@@ -70,7 +70,7 @@ void main(void)
     //INTERRUPT_PeripheralInterruptEnable();
 
     // Disable the Peripheral Interrupts
-    //INTERRUPT_PeripheralInterruptDisable();
+    INTERRUPT_PeripheralInterruptDisable();
     Graphic_init();
     Graphic_test();
     //gsm_init(0);

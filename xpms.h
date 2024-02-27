@@ -308,7 +308,7 @@ const uint8_t qrcode1_xpm[] = {
 
 
 const uint8_t mms_xpm[] = {\
-"/* XPM */,chan1,R159.85..."\
+"/* XPM */,chan1,R159.85:"\
 "static const char *const qrcode_xpm[] = {"\
 "/* width height ncolors chars_per_pixel *"\
 "\"39 39 2 1\","\

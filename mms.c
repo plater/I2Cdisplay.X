@@ -77,14 +77,14 @@ void Get_mms(void)
 void parse_themms(void)//Format xpm for display
 {
     uint16_t xy = 0;
-    srchbuf0 = memchr(gsmmsg, ',', 32);
-    srchbuf1 = memchr(srchbuf0 + 1, '.', 24);
+    srchbuf0 = memchr(gsmmsg, ',', 32); //Look for the first comma
+    srchbuf1 = memchr(srchbuf0 + 1, ':', 24); //Look for the colon after info
     credit = srchbuf1 - srchbuf0;
     credit++;
     memset(gsmusd, NULL, 192);
     srchbuf0 = memcpy(gsmusd, srchbuf0, credit); //Copy file info for FPM storage
     Store_themms(Chan01_info, gsmusd, credit); //Finished storing the info
-    srchbuf1 = strstr(gsmmsg, "/* pixels */");
+    srchbuf1 = strstr(gsmmsg, "/* pixels */");// indicates the start of the image
     srchbuf2 = gsmmsg;
     csqval = credit;
     while(xy < csqval)
@@ -98,6 +98,7 @@ void parse_themms(void)//Format xpm for display
         srchbuf2[0] = 'E';
         srchbuf2++;
         srchbuf1 = srchbuf0 + credit + 1;
+        xy++;
     }
 }
 

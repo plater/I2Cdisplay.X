@@ -6,7 +6,9 @@
  */
 #include "gsm.h"
 /**/
-
+uint8_t * srchbuf0;
+uint8_t * srchbuf1;
+uint8_t * srchbuf2;
 /*"AT+CMMSCURL=\"mmsc.monternet.com\""
  OK
  AT+CMMSCID=1
@@ -50,7 +52,7 @@ void Get_mms(void)
 +CMMSRECV: "+27766520007","2024-02-17,12:29:39","",2023
 1,"smil.xml",10,242
 2,"text_0.txt",4,168*/
-            memset(gsmusd, NULL, 383); 
+            memset(gsmusd, NULL, 192); 
             sprintf(gsmums, "AT+CMMSRECV=%d\r", mmsbyte); //This takes 10 seconds maybe more
             gsm_msg(gsmums);
             csqval = Read_timeout2(gsmusd, 383);//<fileIndex,name,type,filesize>
@@ -66,7 +68,7 @@ void Get_mms(void)
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
             Read_themms(gsmmsg, mmsbyte2);
-            Store_themms(mmsbyte2, Chan01_xpm);
+            Store_themms(Chan01_xpm, gsmmsg, mmsbyte2);
         }
     }
     goto repeatmms;
@@ -74,8 +76,29 @@ void Get_mms(void)
 
 void parse_themms(void)//Format xpm for display
 {
-    
-    srchbuf1 = strstr(gsmmsg, "/* pixels */,");
+    uint16_t xy = 0;
+    srchbuf0 = memchr(gsmmsg, ',', 32);
+    srchbuf1 = memchr(srchbuf0 + 1, '.', 24);
+    credit = srchbuf1 - srchbuf0;
+    credit++;
+    memset(gsmusd, NULL, 192);
+    srchbuf0 = memcpy(gsmusd, srchbuf0, credit); //Copy file info for FPM storage
+    Store_themms(Chan01_info, gsmusd, credit); //Finished storing the info
+    srchbuf1 = strstr(gsmmsg, "/* pixels */");
+    srchbuf2 = gsmmsg;
+    csqval = credit;
+    while(xy < csqval)
+    {
+        srchbuf0 = strstr(srchbuf1, "\"B");// This is the start of line 1
+        srchbuf0++;//First pixel drop the "
+        srchbuf1 = strstr(srchbuf0, "\",");//srchbuf1 contains the first pixel line end
+        credit = srchbuf1 - srchbuf0;//This is the pixel row size
+        memmove(srchbuf2, srchbuf0, (credit + 1));// Move one xpm line to gsmmsg beginning
+        srchbuf2 = srchbuf2 + credit;
+        srchbuf2[0] = 'E';
+        srchbuf2++;
+        srchbuf1 = srchbuf0 + credit + 1;
+    }
 }
 
 void Test_pfm(void)
@@ -83,10 +106,11 @@ void Test_pfm(void)
     mmsbyte2 = (strlen(mms_xpm)) + 2;
     srchbuf0 = memcpy(gsmmsg, mms_xpm, mmsbyte2);
     parse_themms();
-    Store_themms(mmsbyte2, Chan01_xpm);
+    srchbuf1 = Chan01_xpm;
+    Store_themms(srchbuf1, gsmmsg, mmsbyte2);
 }
 
-void Store_themms(uint16_t mmssize, uint32_t flashadd) //mmssize stores the file size
+void Store_themms(uint32_t flashadd, uint8_t* flashsrc, uint16_t mmssize ) //mmssize stores the file size
 {
     #if 1
     int8_t z;
@@ -94,23 +118,23 @@ void Store_themms(uint16_t mmssize, uint32_t flashadd) //mmssize stores the file
     uint16_t tblock = 0;
     uint32_t fflashadd;
     fflashadd = flashadd;
-    srchbuf0 = gsmmsg;
+    srchbuf0 = flashsrc;
     tblocksz = mmssize / WRITE_FLASH_BLOCKSIZE;
     tblocksz++;  //Contains the number of blocks needed
     if(tblocksz > (BUF_SIZE / WRITE_FLASH_BLOCKSIZE)) //If file too big
     {
         tblocksz = (BUF_SIZE / WRITE_FLASH_BLOCKSIZE);//Truncate it.
     }
-    while(tblock <= tblocksz)
+    while(tblock < tblocksz)
     {
         FLASH_EraseBlock(fflashadd);
         PIR7bits.NVMIF = 0;
-        z = MyFLASH_WriteBlock(fflashadd, srchbuf0);
+        z = MyFLASH_WriteBlock(fflashadd, flashsrc);
         if(z == 0)
         {
             tblock++;
             fflashadd = fflashadd + WRITE_FLASH_BLOCKSIZE;
-            srchbuf0 = srchbuf0 + WRITE_FLASH_BLOCKSIZE;
+            flashsrc = flashsrc + WRITE_FLASH_BLOCKSIZE;
             
         }
     }

@@ -27,6 +27,7 @@
             <word>co</word>
             <word>electronicwings</word>
             <word>gsmbyte</word>
+            <word>gsmmsg</word>
             <word>http</word>
             <word>https</word>
             <word>mms</word>
@@ -38,6 +39,7 @@
             <word>vodacom</word>
             <word>www</word>
             <word>xml</word>
+            <word>xpm</word>
             <word>za</word>
         </spellchecker-wordlist>
     </configuration>

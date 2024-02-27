@@ -53,22 +53,40 @@ typedef ptrdiff_t idx_t;
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
 #define BUF_SIZE          2048
 #define XPM_HEADER_SIZE   124  //This is the size of the XPM's header
- __at(0x2000)
-extern const uint8_t Chan01_xpm[2048];
- __at(0x2800)
-extern const uint8_t Chan02_xpm[2048];
- __at(0x3000)
-extern const uint8_t Chan03_xpm[2048];
- __at(0x3800)
-extern const uint8_t Chan04_xpm[2048];
+__at(0x2000)
+extern const uint8_t Chan01_xpm[1920];
+__at(0x2780)
+extern const uint8_t Chan01_info[128];
+__at(0x2800)
+extern const uint8_t Chan02_xpm[1920];
+__at(0x2F80)
+extern const uint8_t Chan02_info[128];
+__at(0x3000)
+extern const uint8_t Chan03_xpm[1920];
+__at(0x3780)
+extern const uint8_t Chan03_info[128];
+__at(0x3800)
+extern const uint8_t Chan04_xpm[1920];
+__at(0x3F80)
+extern const uint8_t Chan04_info[128];
 #if 1    
-const uint8_t Chan01_xpm[2048];
-const uint8_t Chan02_xpm[2048];
-const uint8_t Chan03_xpm[2048];
-const uint8_t Chan04_xpm[2048];
+const uint8_t Chan01_xpm[1920];
+const uint8_t Chan01_info[128];
+const uint8_t Chan02_xpm[1920];
+const uint8_t Chan02_info[128];
+const uint8_t Chan03_xpm[1920];
+const uint8_t Chan03_info[128];
+const uint8_t Chan04_xpm[1920];
+const uint8_t Chan04_info[128];
 #endif
 ;
+extern uint8_t * srchbuf0;
+extern uint8_t * srchbuf1;
+extern uint8_t * srchbuf2;
+
 uint8_t gsmmsg[2048];
+//ussd storage
+uint8_t gsmusd[128];
 
     bool ledredflash;
     bool ledgreenflash;
@@ -94,17 +112,14 @@ uint16_t csqval;
 //uint8_t gsmbyte =error: 0;
 //moble network code 01 = Vodacom, 10 or 12 = Mtn
 //uint8_t mncbyte = 0;
-uint8_t * srchbuf0;
-uint8_t * srchbuf1;
-uint8_t * srchbuf2;
 //gsm scratch pad
 
 //sms storage
 uint8_t gsmums[64];
 //ussd storage
-uint8_t gsmusd[192];
+//uint8_t gsmusd[128];
 //Store unsolicited notifications
-uint8_t gsmusm[64];
+uint8_t gsmusm[32];
 uint8_t gsmtim[24];
 //Store date
 uint8_t gsdate[10];
@@ -216,7 +231,7 @@ void Test_pfm(void);
 
 void Read_themms(uint8_t* messbuf, uint16_t mmssize);
 
-void Store_themms(uint16_t mmssize, uint32_t flashadd);
+void Store_themms(uint32_t flashadd, uint8_t* flashsrc, uint16_t mmssize );
 
 bool MyFLASH_WriteBlock(uint32_t writeAddr, uint8_t *flashWrBufPtr);
 

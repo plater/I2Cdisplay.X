@@ -84,22 +84,31 @@ void parse_themms(void)//Format xpm for display
     memset(gsmusd, NULL, 192);
     srchbuf0 = memcpy(gsmusd, srchbuf0, credit); //Copy file info for FPM storage
     Store_themms(Chan01_info, gsmusd, credit); //Finished storing the info
-    srchbuf1 = strstr(gsmmsg, "/* pixels */");// indicates the start of the image
+    srchbuf1 = strstr(gsmmsg, "\"BBBB");// indicates the start of the image
+    srchbuf0 = strstr(srchbuf1, "B\","); //End of first pixel row
+    csqval = srchbuf0 - srchbuf1; // The number of pixels in a row = the number of rows
+    /* srchbuf1 = line start and srchbuf0 = end of line*/
     srchbuf2 = gsmmsg;
-    csqval = credit;
     while(xy < csqval)
     {
-        srchbuf0 = strstr(srchbuf1, "\"B");// This is the start of line 1
+        srchbuf0 = strstr(srchbuf1, "\"B");// This is the start of the line
         srchbuf0++;//First pixel drop the "
         srchbuf1 = strstr(srchbuf0, "\",");//srchbuf1 contains the first pixel line end
+        if(!srchbuf1)
+        {
+            srchbuf1 = strstr(srchbuf0, "\"}");
+        }
         credit = srchbuf1 - srchbuf0;//This is the pixel row size
         memmove(srchbuf2, srchbuf0, (credit + 1));// Move one xpm line to gsmmsg beginning
         srchbuf2 = srchbuf2 + credit;
         srchbuf2[0] = 'E';
         srchbuf2++;
+        srchbuf2[0] = NULL;
+        srchbuf2[1] = NULL;
         srchbuf1 = srchbuf0 + credit + 1;
         xy++;
     }
+    srchbuf2[0] = '\e';
 }
 
 void Test_pfm(void)
@@ -107,7 +116,10 @@ void Test_pfm(void)
     mmsbyte2 = (strlen(mms_xpm)) + 2;
     srchbuf0 = memcpy(gsmmsg, mms_xpm, mmsbyte2);
     parse_themms();
+    mmsbyte2 = strlen(gsmmsg);
     srchbuf1 = Chan01_xpm;
+    srchbuf2 = gsmmsg + mmsbyte2;
+    memset(srchbuf2, NULL, 129);
     Store_themms(srchbuf1, gsmmsg, mmsbyte2);
 }
 

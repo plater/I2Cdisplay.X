@@ -81,7 +81,7 @@ void main(void)
     }
     while(!SERVICE_GetValue());
     Graphic_Clear();
-    Write_Qrcode(qrcode1_xpm);
+    Write_Qrcode(Chan01_xpm);
     Test_pfm();
     Get_mms();
     while(SERVICE_GetValue())

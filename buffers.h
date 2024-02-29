@@ -51,6 +51,7 @@ typedef ptrdiff_t idx_t;
 
 /*const HEFregion[128] __at(0x1F80);*/
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
+#define STORAGE_SIZE      2048
 #define BUF_SIZE          1920
 #define XPM_HEADER_SIZE   124  //This is the size of the XPM's header
 __at(0x2000)
@@ -87,6 +88,8 @@ extern uint8_t * srchbuf2;
 uint8_t gsmmsg[2048];
 //ussd storage
 uint8_t gsmusd[128];
+
+uint8_t * xpmaddress;
 
     bool ledredflash;
     bool ledgreenflash;
@@ -151,7 +154,7 @@ uint8_t urlbuf[200];
 
 uint8_t * searchbufa;
 
-int price;
+int16_t price;
 uint8_t channum;
 /**dispense related
  */

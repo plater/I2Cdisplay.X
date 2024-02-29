@@ -76,14 +76,32 @@ void Get_mms(void)
 
 void parse_themms(void)//Format xpm for display
 {
-    uint16_t xy = 0;
+    uint16_t decim,wprc;
+    uint16_t xy = 1;
     srchbuf0 = memchr(gsmmsg, ',', 32); //Look for the first comma
     srchbuf1 = memchr(srchbuf0 + 1, ':', 24); //Look for the colon after info
     credit = srchbuf1 - srchbuf0;
     credit++;
     memset(gsmusd, NULL, 192);
     srchbuf0 = memcpy(gsmusd, srchbuf0, credit); //Copy file info for FPM storage
-    Store_themms(Chan01_info, gsmusd, credit); //Finished storing the info
+    srchbuf0 = strstr(gsmusd, "chan");//"/* XPM */,chan1,R159.85:"
+    srchbuf0 = srchbuf0 + 4; //Set at channel number
+    channum = atoi(srchbuf0); // channum contains the channel number
+    srchbuf0 = strstr(gsmusd, ",R");
+    srchbuf0 = srchbuf0 + 2; //Set at price
+    price = atoi(srchbuf0);//price section
+    wprc = price / 100;
+    decim = price % 100;
+    
+    price = sprintf(gsmusd, "Channel %d\nPrice R%.2d.%.2d.", channum, wprc, decim);
+    xpmaddress = Chan01_xpm; // searchbufa stores the channels storage address
+    while(xy < channum)
+    {
+        xpmaddress = xpmaddress + STORAGE_SIZE;
+        xy++;
+    }
+    xy = 0;
+    Store_themms((xpmaddress + BUF_SIZE), gsmusd, credit); //Finished storing the info
     srchbuf1 = strstr(gsmmsg, "\"BBBB");// indicates the start of the image
     srchbuf0 = strstr(srchbuf1, "B\","); //End of first pixel row
     csqval = srchbuf0 - srchbuf1; // The number of pixels in a row = the number of rows

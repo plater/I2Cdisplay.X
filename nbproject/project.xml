@@ -24,6 +24,8 @@
             </formatting>
         </data>
         <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>chan</word>
+            <word>channum</word>
             <word>co</word>
             <word>electronicwings</word>
             <word>gsmbyte</word>
@@ -34,6 +36,7 @@
             <word>mmsc</word>
             <word>ncolors</word>
             <word>ptrdiff</word>
+            <word>searchbufa</word>
             <word>smil</word>
             <word>txt</word>
             <word>vodacom</word>

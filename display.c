@@ -279,8 +279,8 @@ void Write_Qrcode(const uint8_t xpmname[])
 	CS1_SetLow();
     Qr_Text(chan1a_txt, 34, 0);
     Qr_Text(chan1a_ptic, 23, 1);
-	ypos = 42;
-	pagepos = 2;
+	ypos = 46;
+	pagepos = 3;
     z = 0;
     zbu=0;
     qrbyte = 0; // holds xpm pixel value
@@ -302,7 +302,7 @@ void Write_Qrcode(const uint8_t xpmname[])
 		qrbyte = xpmname[z]; //z contains position from start of line
 		if(qrbyte == 'E')//End of line
 		{
-			Set_Column(42);
+			Set_Column(ypos);
 			Set_Page(++pagepos);
 			linecount = linecount + 8;
             if(linecount >= noline)

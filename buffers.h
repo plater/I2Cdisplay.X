@@ -230,6 +230,8 @@ void Display_csq(void);
 
 void Get_mms(void);
 
+void parse_themms(void);
+
 void Test_pfm(void);
 
 void Read_themms(uint8_t* messbuf, uint16_t mmssize);
@@ -288,7 +290,9 @@ void Write_Font(uint8_t _font);
 
 void SPI_write8bit(uint8_t data);
 
-void Write_Qrcode(const uint8_t xpmname[]);
+void Write_Qrcode(uint8_t channeln);
+
+void Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost);
 
 void Graphic_Clear(void);
 

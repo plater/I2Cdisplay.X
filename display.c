@@ -255,7 +255,7 @@ void Load_Qrcode(const uint8_t xpmname[])
     Write_Qrcode(xpmname);
 }
 
-Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
+void Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
 {
     ypos = xpos;
     pagepos = ypost;
@@ -266,16 +266,24 @@ Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
 
 //Position page 2 to 7 column 43
 //Display qrcode on screen.
-void Write_Qrcode(const uint8_t xpmname[])
+void Write_Qrcode(uint8_t channeln)
 {
 	static uint16_t z, xpmlng, scrat, noline;
-    uint16_t x;
+    uint16_t x, xy;
 	uint8_t qrbyte;
 	uint8_t linecount = 0;
     uint16_t l, zbu, w;
     uint8_t *e;
     uint8_t over;
     
+    xy = 1;
+    xpmaddress = Chan01_xpm; // xpmaddress stores the channels storage address
+    while(xy < channum)
+    {
+        xpmaddress = xpmaddress + STORAGE_SIZE;
+        xy++;
+    }
+
 	CS1_SetLow();
     Qr_Text(chan1a_txt, 34, 0);
     Qr_Text(chan1a_ptic, 23, 1);
@@ -284,9 +292,9 @@ void Write_Qrcode(const uint8_t xpmname[])
     z = 0;
     zbu=0;
     qrbyte = 0; // holds xpm pixel value
-    xpmlng = strlen(xpmname);
-    e = memchr(xpmname, 'E', 64); //find the line length
-    l = e - xpmname;              //store it's value in l
+    xpmlng = strlen(xpmaddress);
+    e = memchr(xpmaddress, 'E', 64); //find the line length
+    l = e - xpmaddress;              //store it's value in l
     l++;
     noline = xpmlng / l;
     w = noline;
@@ -299,7 +307,7 @@ void Write_Qrcode(const uint8_t xpmname[])
 	for(x=0; x < 8; x++)
 	{
 		qbyte = qbyte >> 1;
-		qrbyte = xpmname[z]; //z contains position from start of line
+		qrbyte = xpmaddress[z]; //z contains position from start of line
 		if(qrbyte == 'E')//End of line
 		{
 			Set_Column(ypos);
@@ -310,7 +318,7 @@ void Write_Qrcode(const uint8_t xpmname[])
                 goto exitqr;
             }
 			zbu = (linecount * l); //go to next 8 rows +330
-            qrbyte = xpmname[++z];
+            qrbyte = xpmaddress[++z];
             if(qrbyte == 0) // NULL string end
             {
                 NOP();

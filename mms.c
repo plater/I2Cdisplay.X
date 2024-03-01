@@ -68,7 +68,11 @@ void Get_mms(void)
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
             Read_themms(gsmmsg, mmsbyte2);
-            Store_themms(Chan01_xpm, gsmmsg, mmsbyte2);
+            parse_themms();
+            mmsbyte2 = strlen(gsmmsg);
+            srchbuf2 = gsmmsg + mmsbyte2;
+            memset(srchbuf2, NULL, 256);
+            Store_themms(xpmaddress, gsmmsg, mmsbyte2);
         }
     }
     goto repeatmms;
@@ -93,8 +97,8 @@ void parse_themms(void)//Format xpm for display
     wprc = price / 100;
     decim = price % 100;
     
-    price = sprintf(gsmusd, "Channel %d\nPrice R%.2d.%.2d.", channum, wprc, decim);
-    xpmaddress = Chan01_xpm; // searchbufa stores the channels storage address
+    credit = sprintf(gsmusd, "Channel %d\nPrice R%.2d.%.2d.", channum, wprc, decim);
+    xpmaddress = Chan01_xpm; // xpmaddress stores the channels storage address
     while(xy < channum)
     {
         xpmaddress = xpmaddress + STORAGE_SIZE;
@@ -135,10 +139,9 @@ void Test_pfm(void)
     srchbuf0 = memcpy(gsmmsg, mms_xpm, mmsbyte2);
     parse_themms();
     mmsbyte2 = strlen(gsmmsg);
-    srchbuf1 = Chan01_xpm;
     srchbuf2 = gsmmsg + mmsbyte2;
-    memset(srchbuf2, NULL, 129);
-    Store_themms(srchbuf1, gsmmsg, mmsbyte2);
+    memset(srchbuf2, NULL, 256);
+    Store_themms(xpmaddress, gsmmsg, mmsbyte2);
 }
 
 void Store_themms(uint32_t flashadd, uint8_t* flashsrc, uint16_t mmssize ) //mmssize stores the file size

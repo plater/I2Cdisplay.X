@@ -43,6 +43,7 @@
             <word>www</word>
             <word>xml</word>
             <word>xpm</word>
+            <word>xpmaddress</word>
             <word>za</word>
         </spellchecker-wordlist>
     </configuration>

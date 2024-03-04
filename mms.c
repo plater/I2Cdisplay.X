@@ -73,6 +73,7 @@ void Get_mms(void)
             srchbuf2 = gsmmsg + mmsbyte2;
             memset(srchbuf2, NULL, 256);
             Store_themms(xpmaddress, gsmmsg, mmsbyte2);
+            Write_Qrcode(channum);
         }
     }
     goto repeatmms;

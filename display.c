@@ -268,6 +268,7 @@ void Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost)
 //Display qrcode on screen.
 void Write_Qrcode(uint8_t channeln)
 {
+    uint8_t dcache[16];//one line of characters = 16 characters
 	static uint16_t z, xpmlng, scrat, noline;
     uint16_t x, xy;
 	uint8_t qrbyte;
@@ -283,10 +284,22 @@ void Write_Qrcode(uint8_t channeln)
         xpmaddress = xpmaddress + STORAGE_SIZE;
         xy++;
     }
-
+    srchbuf0 = xpmaddress + BUF_SIZE;//Set xpm info address
+    srchbuf1 = strstr(srchbuf0, "\nP");
+    x = srchbuf1 - srchbuf0;
+    memcpy(dcache, srchbuf0, x);
+    dcache[x] = NULL;
+    x = x * 8;//Calculate total columns
+    xy = DISPLAY_COL - x;// used  to center the line
+    xy = xy/2; //Calculate offset to center the line
 	CS1_SetLow();
-    Qr_Text(chan1a_txt, 34, 0);
-    Qr_Text(chan1a_ptic, 23, 1);
+    Qr_Text(dcache, xy, 0);
+    srchbuf1++;
+    x = strlen(srchbuf1);
+    x = x * 8;//Calculate total columns
+    xy = DISPLAY_COL - x;
+    xy = xy/2; //Calculate offset to center the line
+    Qr_Text(srchbuf1, xy, 1);
 	ypos = 46;
 	pagepos = 3;
     z = 0;

@@ -53,7 +53,9 @@ typedef ptrdiff_t idx_t;
 /* XPM Flash storage 2048 bytes or 16 128 byte blocks each*/
 #define STORAGE_SIZE      2048
 #define BUF_SIZE          1920
-#define XPM_HEADER_SIZE   124  //This is the size of the XPM's header
+#define XPM_HEADER_SIZE   128  //This is the size of the XPM's header
+#define DISPLAY_CHAR      16 //16 characters per line
+#define DISPLAY_COL       128//Display width is 128 pixels
 __at(0x2000)
 extern const uint8_t Chan01_xpm[1920];
 __at(0x2780)

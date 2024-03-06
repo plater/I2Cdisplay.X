@@ -130,7 +130,7 @@ void gsm_init(bool inittype)
     {
         goto errorecho;
     }
-    //led_switch(3); //LED toggle GREEN
+    //led_switch(3); ////LED toggle GREEN
 	gsm_msg((uint8_t*)"AT+CREG=1\r");
 	gsm_receive(1, gsmusm);
     ClrWdt();
@@ -152,7 +152,7 @@ void gsm_init(bool inittype)
     {
         goto repeatoff;
     }
-    //led_switch(2); //LED toggle GREEN
+    //led_switch(2); ////LED toggle GREEN
     uint8_t w = get_csq();
     if(w <= 0)
     {
@@ -161,19 +161,19 @@ void gsm_init(bool inittype)
     if(w > 9)
     {
         //10 - 14, 15 - 19, 20 - 24 and >= 25
-        LED4_SetHigh();
+        //LED4_SetHigh();
     }
     if(w > 14)
     {
-        LED3_SetHigh();
+        //LED3_SetHigh();
     }
     if(w > 19)
     {
-        LED2_SetHigh();
+        //LED2_SetHigh();
     }
     if(w > 24)
     {
-        LED1_SetHigh();
+        //LED1_SetHigh();
     }
     
     gsm_msg((uint8_t*)tsoftid);

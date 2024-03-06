@@ -393,6 +393,46 @@ void Graphic_Clear(void)
     LATDbits.LATD3 = 1; //Deselect display
    
 }
+#if 0
+SSP2CLKPPS;
+SSP2DATPPS;
+RD0PPS;
+#endif
+/** I2C Pin Initialization */
+static void PPS_Initialize(void)
+{
+    /* PPS setting for using RD2 as SCL */
+    SSP2CLKPPS = 0x09;
+    RD2PPS = 0x0F;
+    /* PPS setting for using RD3 as SDA */
+    SSP2DATPPS = 0x0A;
+    RD3PPS = 0x10;
+    /*From pin_manager.c*/
+    RD2PPS = 0x12;   //RD2->MSSP2:SDA2;    
+    SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2;    
+    RD3PPS = 0x11;   //RD3->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x1B;   //RD3->MSSP2:SCL2;    
+}
+
+/*The PORT_Initialize function sets pins, RB1 and RB2, as digital pins with internal pull-up resistors and in
+open-drain mode:*/
+static void PORT_Initialize(void)
+{
+/* Set pins RD0 to RD4 as Digital for multiple I2C*/
+RD2_SetDigitalMode();
+RD3_SetDigitalMode();
+#if 0 //We don't need these on peripheral D
+/* Set pull-up resistors for RB1 and RB2 */
+WPUBbits.WPUB1 = 1;
+WPUBbits.WPUB2 = 1;
+/* Set open-drain mode for RB1 and RB2 */
+ODCONBbits.ODCB1 = 1;
+ODCONBbits.ODCB2 = 1;
+#endif
+}
+
+
+
 /*XPM storage routines*/
 
 

@@ -44,7 +44,12 @@
 /* Note: ISO C does not mandate that 'size_t' and 'ptrdiff_t' have the same
    size, but it is so on all platforms we have seen since 1990.  */
 typedef ptrdiff_t idx_t;
-
+/*
+RD2PPS = 0x12;   //RD2->MSSP2:SDA2;
+RD3PPS = 0x11;   //RD3->MSSP2:SCL2;
+SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2
+SSP2CLKPPS = 0x1B;   //RD3->MSSP2:SCL2;
+*/
 
 #endif	//XC_HEADER_TEMPLATE_H
 

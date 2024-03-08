@@ -393,12 +393,124 @@ void Graphic_Clear(void)
     LATDbits.LATD3 = 1; //Deselect display
    
 }
+
+void Identify_D(uint8_t dispnum)
+{
+    switch(dispnum)
+    {
+        case 0 :
+            Set_Display(0);
+            Write_String(display1, 6);
+        case 1 :
+            Set_Display(1);
+            Write_String(display2, 6);
+        case 2 :
+            Set_Display(2);
+            Write_String(display3, 6);
+        case 3 :
+            Set_Display(3);
+            Write_String(display4, 6);
+    }
+}
+/** I2C Pin Initialization displays are:
+ *  RD1 = SDA1 RD2 = SDA2 RD3 = SDA3 RD4 = SDA4 */
+
+void Reset_Alldisp(void)
+{
+    RD1_SetHigh();
+    RD2_SetHigh();
+    RD3_SetHigh();
+    RD4_SetHigh();
+    RD1PPS = 0x0;
+    RD2PPS = 0x0;
+    RD3PPS = 0x0;
+    RD4PPS = 0x0;
+}
+
+void Set_Alldisp(void)
+{
+    RD1PPS = 0x12;
+    RD2PPS = 0x12;
+    RD3PPS = 0x12;
+    RD4PPS = 0x12;
+}
+
+void Reset_Display(uint8_t dispnum)
+{
+    dispnum = dispnum & 0x03;
+    switch(dispnum)
+    {
+        case 0 :
+            RD1_SetHigh();
+            RD1PPS = 0x0;
+            break;
+        case 1 :
+            RD2_SetHigh();
+            RD2PPS = 0x0;
+            break;
+        case 2 :
+            RD3_SetHigh();
+            RD3PPS = 0x0;
+            break;
+        case 3 :
+            RD4_SetHigh();
+            RD4PPS = 0x0;
+    }
+   
+}
+
+void Set_Display(uint8_t dispnum)
+{
+    dispnum = dispnum & 0x03;
+    switch(dispnum)
+    {
+        case 0 :
+            SSP2DATPPS = 0x19;   //RD1->MSSP2:SDA2;
+            RD1PPS = 0x12;
+            break;
+        case 1 :
+            SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2;
+            RD2PPS = 0x12;
+            break;
+        case 2 :
+            SSP2DATPPS = 0x1B;   //RD3->MSSP2:SDA2;
+            RD3PPS = 0x12;
+            break;
+        case 3 :
+            SSP2DATPPS = 0x1C;
+            RD4PPS = 0x12;
+    }
+}
+void DSP_rd1_init(void)
+{
+    SSP2DATPPS = 0x19;   //RD1->MSSP2:SDA2;    
+    RD1PPS = 0x12;   //RD1->MSSP2:SDA2;    
+    RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+}
+void DSP_rd2_init(void)
+{
+    SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2;    
+    RD2PPS = 0x12;   //RD2->MSSP2:SDA2;    
+    RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;
+}
+void DSP_rd3_init(void)
+{
+    SSP2DATPPS = 0x1B;   //RD3->MSSP2:SDA2;    
+    RD3PPS = 0x12;   //RD3->MSSP2:SDA2;    
+    RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+}
+void DSP_rd4_init(void)
+{
+    SSP2DATPPS = 0x1C;   //RD4->MSSP2:SDA2;    
+    RD4PPS = 0x12;   //RD4->MSSP2:SDA2;    
+    RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+}
+
 #if 0
-SSP2CLKPPS;
-SSP2DATPPS;
-RD0PPS;
-#endif
-/** I2C Pin Initialization */
 static void PPS_Initialize(void)
 {
     /* PPS setting for using RD2 as SCL */
@@ -419,7 +531,7 @@ open-drain mode:*/
 static void PORT_Initialize(void)
 {
 /* Set pins RD0 to RD4 as Digital for multiple I2C*/
-RD2_SetDigitalMode();
+//RD2_SetDigitalMode();
 RD3_SetDigitalMode();
 #if 0 //We don't need these on peripheral D
 /* Set pull-up resistors for RB1 and RB2 */
@@ -431,7 +543,7 @@ ODCONBbits.ODCB2 = 1;
 #endif
 }
 
-
+#endif
 
 /*XPM storage routines*/
 

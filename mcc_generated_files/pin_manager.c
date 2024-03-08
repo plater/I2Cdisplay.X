@@ -58,7 +58,7 @@ void PIN_MANAGER_Initialize(void)
     LATx registers
     */
     LATE = 0x00;
-    LATD = 0x1F;
+    LATD = 0x01;
     LATA = 0x00;
     LATB = 0x00;
     LATC = 0x08;
@@ -124,9 +124,9 @@ void PIN_MANAGER_Initialize(void)
    
     
 	
-    RD2PPS = 0x12;   //RD2->MSSP2:SDA2;    
     RX1PPS = 0x14;   //RC4->EUSART1:RX1;    
-    SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2;    
+    SSP2DATPPS = 0x1C;   //RD4->MSSP2:SDA2;    
+    RD4PPS = 0x12;   //RD4->MSSP2:SDA2;    
     RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
     RC5PPS = 0x09;   //RC5->EUSART1:TX1;    
     SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    

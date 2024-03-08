@@ -17,6 +17,12 @@
 #include <stddef.h>
 #include "buffers.h"
 
+
+static const uint8_t display1[] = "Display number 1";
+static const uint8_t display2[] = "Display number 2";
+static const uint8_t display3[] = "Display number 3";
+static const uint8_t display4[] = "Display number 4";
+
 static uint8_t DData[8];
 
 // +---------------------------+

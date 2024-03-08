@@ -293,6 +293,12 @@ void DATAEE_WriteWord(uint16_t bAdd, uint16_t bData);
 
 uint16_t DATAEE_ReadWord(uint16_t bAdd);
 
+void Store_XPM(uint8_t *xpmname, uint8_t* xpmstat);
+
+void Write_String(uint8_t *lcdstring, uint8_t lcdline);
+
+void Continue_String(uint8_t *clcdstring);
+
 void Write_Font(uint8_t _font);
 
 void SPI_write8bit(uint8_t data);
@@ -307,8 +313,23 @@ void Graphic_test(void);
 
 void Graphic_init(void);
 
-void Store_XPM(uint8_t *xpmname, uint8_t* xpmstat);
+void Identify_D(uint8_t dispnum);
 
+void Set_Display(uint8_t dispnum);
+
+void Reset_Display(uint8_t dispnum);
+
+void Set_Alldisp(void);
+
+void Reset_Alldisp(void);
+
+void DSP_rd1_init(void);
+
+void DSP_rd2_init(void);
+
+void DSP_rd3_init(void);
+
+void DSP_rd4_init(void);
 /** ***** I2C routines *****/
 
 void myI2C2_WriteNBytes(i2c2_address_t address, uint8_t* data, size_t len);

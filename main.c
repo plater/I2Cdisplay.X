@@ -43,6 +43,7 @@
 
 #include "mcc_generated_files/mcc.h"
 #include "buffers.h"
+#include "display.h"
 #include "xpms.h"
 /*
                          Main application
@@ -71,8 +72,21 @@ void main(void)
 
     // Disable the Peripheral Interrupts
     INTERRUPT_PeripheralInterruptDisable();
+    Reset_Alldisp();
+    DSP_rd1_init();
+    DSP_rd2_init();
+    DSP_rd3_init();
+    DSP_rd4_init();
+    Set_Display(0);
+    Set_Display(1);
+    Set_Display(2);
+    Set_Display(3);
     Graphic_init();
     Graphic_test();
+    Write_String(display1, 6);
+    Write_String(display2, 6);
+    Write_String(display3, 6);
+    Write_String(display2, 6);
     gsm_init(0);
  //   Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())

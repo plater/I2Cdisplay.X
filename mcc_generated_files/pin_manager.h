@@ -281,17 +281,25 @@
 #define RD1_SetAnalogMode()      do { ANSELDbits.ANSELD1 = 1; } while(0)
 #define RD1_SetDigitalMode()     do { ANSELDbits.ANSELD1 = 0; } while(0)
 
-// get/set RD2 procedures
+// get/set RD2 aliases
+#define RD2_TRIS                 TRISDbits.TRISD2
+#define RD2_LAT                  LATDbits.LATD2
+#define RD2_PORT                 PORTDbits.RD2
+#define RD2_WPU                  WPUDbits.WPUD2
+#define RD2_OD                   ODCONDbits.ODCD2
+#define RD2_ANS                  ANSELDbits.ANSELD2
 #define RD2_SetHigh()            do { LATDbits.LATD2 = 1; } while(0)
 #define RD2_SetLow()             do { LATDbits.LATD2 = 0; } while(0)
 #define RD2_Toggle()             do { LATDbits.LATD2 = ~LATDbits.LATD2; } while(0)
-#define RD2_GetValue()              PORTDbits.RD2
+#define RD2_GetValue()           PORTDbits.RD2
 #define RD2_SetDigitalInput()    do { TRISDbits.TRISD2 = 1; } while(0)
 #define RD2_SetDigitalOutput()   do { TRISDbits.TRISD2 = 0; } while(0)
-#define RD2_SetPullup()             do { WPUDbits.WPUD2 = 1; } while(0)
-#define RD2_ResetPullup()           do { WPUDbits.WPUD2 = 0; } while(0)
-#define RD2_SetAnalogMode()         do { ANSELDbits.ANSELD2 = 1; } while(0)
-#define RD2_SetDigitalMode()        do { ANSELDbits.ANSELD2 = 0; } while(0)
+#define RD2_SetPullup()          do { WPUDbits.WPUD2 = 1; } while(0)
+#define RD2_ResetPullup()        do { WPUDbits.WPUD2 = 0; } while(0)
+#define RD2_SetPushPull()        do { ODCONDbits.ODCD2 = 0; } while(0)
+#define RD2_SetOpenDrain()       do { ODCONDbits.ODCD2 = 1; } while(0)
+#define RD2_SetAnalogMode()      do { ANSELDbits.ANSELD2 = 1; } while(0)
+#define RD2_SetDigitalMode()     do { ANSELDbits.ANSELD2 = 0; } while(0)
 
 // get/set RD3 aliases
 #define RD3_TRIS                 TRISDbits.TRISD3

@@ -137,7 +137,7 @@ void Graphic_test(void)
     CS1_SetHigh(); //Deselect display
     __asm__("NOP");
 }
-
+#if 0
 void disp_clock(void)
 {
     Graphic_Clear();
@@ -147,7 +147,7 @@ void disp_clock(void)
     Write_String((uint8_t*)clocktime, 3);
     Continue_String(gstime);
 }
-
+#endif
 void Graphic_init(void)
 {
     uint8_t         *pData;
@@ -486,7 +486,12 @@ void DSP_rd1_init(void)
     SSP2DATPPS = 0x19;   //RD1->MSSP2:SDA2;    
     RD1PPS = 0x12;   //RD1->MSSP2:SDA2;    
     RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
-    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+    SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;
+    Graphic_init();//init display one
+    Graphic_Clear();
+    Write_String(display1, 4);
+    RD1_SetHigh();
+    RD1PPS = 0x0;
 }
 void DSP_rd2_init(void)
 {
@@ -494,6 +499,11 @@ void DSP_rd2_init(void)
     RD2PPS = 0x12;   //RD2->MSSP2:SDA2;    
     RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
     SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;
+    Graphic_init();//init display one
+    Graphic_Clear();
+    Write_String(display2, 4);
+    RD2_SetHigh();
+    RD2PPS = 0x0;
 }
 void DSP_rd3_init(void)
 {
@@ -501,6 +511,11 @@ void DSP_rd3_init(void)
     RD3PPS = 0x12;   //RD3->MSSP2:SDA2;    
     RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
     SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+    Graphic_init();//init display one
+    Graphic_Clear();
+    Write_String(display3, 4);
+    RD3_SetHigh();
+    RD3PPS = 0x0;
 }
 void DSP_rd4_init(void)
 {
@@ -508,6 +523,11 @@ void DSP_rd4_init(void)
     RD4PPS = 0x12;   //RD4->MSSP2:SDA2;    
     RD0PPS = 0x11;   //RD0->MSSP2:SCL2;    
     SSP2CLKPPS = 0x18;   //RD0->MSSP2:SCL2;    
+    Graphic_init();//init display one
+    Graphic_Clear();
+    Write_String(display4, 4);
+    RD4_SetHigh();
+    RD4PPS = 0x0;
 }
 
 #if 0

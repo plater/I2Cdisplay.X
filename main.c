@@ -81,13 +81,10 @@ void main(void)
     Set_Display(1);
     Set_Display(2);
     Set_Display(3);
-    Graphic_init();
     Graphic_test();
-    Write_String(display1, 6);
-    Write_String(display2, 6);
-    Write_String(display3, 6);
-    Write_String(display2, 6);
     gsm_init(0);
+    Get_mms();
+
  //   Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())
     {
@@ -96,7 +93,6 @@ void main(void)
     while(!SERVICE_GetValue());
     Graphic_Clear();
     Write_Qrcode(1);
-    Get_mms();
     while(SERVICE_GetValue())
     {
         ClrWdt();

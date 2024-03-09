@@ -18,10 +18,16 @@
 #include "buffers.h"
 
 
-static const uint8_t display1[] = "Display number 1";
-static const uint8_t display2[] = "Display number 2";
-static const uint8_t display3[] = "Display number 3";
-static const uint8_t display4[] = "Display number 4";
+static const uint8_t display1[] = "  Display number 1";
+static const uint8_t display2[] = "  Display number 2";
+static const uint8_t display3[] = "  Display number 3";
+static const uint8_t display4[] = "  Display number 4";
+
+static const uint8_t nostock[]  = " No stock here!";
+static const uint8_t plwait[]   = "  Please wait";
+static const uint8_t waitmms[]  = "  Waiting for mms";
+static const uint8_t downmms[]  = " Downloading mms";
+static const uint8_t storemms[] = " Storing mms";
 
 static uint8_t DData[8];
 
@@ -311,8 +317,8 @@ static const uint8_t INIT_SSD1306[] = {
 #define SLAVE_I2C_GENERIC_DEVICE_TIMEOUT      65535   // define slave timeout 
 // I2C2_MESSAGE_STATUS *pstatus;
 //#define dsp_
-static const uint8_t clocktime[] = "Time: ";
-static const uint8_t clockdate[] = "Date: ";
+//const uint8_t clocktime[] = "Time: ";
+//const uint8_t clockdate[] = "Date: ";
    
 
 static int fontpos = 0;

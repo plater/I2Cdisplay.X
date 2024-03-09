@@ -5,6 +5,7 @@
  * Created on Sun 25 Feb 2024 14:59:17 SAST 
  */
 #include "gsm.h"
+#include "display.h"
 /**/
 uint8_t * srchbuf0;
 uint8_t * srchbuf1;
@@ -23,12 +24,16 @@ OK
 //DAILYASAP50
 void Get_mms(void)
 {
+    Set_Alldisp();
+    Graphic_Clear();
     mms_init();
+    Write_String(waitmms, 4);
     gsm_msg("AT+CMGD=1,4\r");
     gsm_receive(1, gsmusd);
-    repeatmms:
+    
     while(SERVICE_GetValue())
     {
+        repeatmms:
         csqval = Read_timeout1(gsmusd, 64);// look for +CMTI: "SM",3,"MMS PUSH"
         if(csqval > 6)
         {
@@ -53,6 +58,7 @@ void Get_mms(void)
 1,"smil.xml",10,242
 2,"text_0.txt",4,168*/
             memset(gsmusd, NULL, 192); 
+            Write_String(downmms, 4);
             sprintf(gsmums, "AT+CMMSRECV=%d\r", mmsbyte); //This takes 10 seconds maybe more
             gsm_msg(gsmums);
             csqval = Read_timeout2(gsmusd, 383);//<fileIndex,name,type,filesize>
@@ -68,15 +74,23 @@ void Get_mms(void)
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
             Read_themms(gsmmsg, mmsbyte2);
+            Write_String(storemms, 4);
             parse_themms();
             mmsbyte2 = strlen(gsmmsg);
             srchbuf2 = gsmmsg + mmsbyte2;
             memset(srchbuf2, NULL, 256);
             Store_themms(xpmaddress, gsmmsg, mmsbyte2);
             Write_Qrcode(channum);
+            while(SERVICE_GetValue());
+            gsm_msg("AT+CMGD=1,4\r");
+            gsm_receive(1, gsmusd);
+            Graphic_Clear();
+            mms_init();
+            Write_String(waitmms, 4);
+            goto repeatmms;
+
         }
     }
-    goto repeatmms;
 }
 
 void parse_themms(void)//Format xpm for display

@@ -1,0 +1,336 @@
+diff -u ~/MPLABXProjects/scandrop.X/gsm.c gsm.c
+--- /home/davepl/MPLABXProjects/scandrop.X/gsm.c        2024-01-12 15:08:37.056578156 +0200
++++ gsm.c       2024-03-05 12:38:27.284393907 +0200
+@@ -6,22 +6,6 @@
+  */
+ #include "gsm.h"
+
+-void fast_ledflash(bool colour)
+-{
+-    if(colour) //red = 1 and ledgreen = 0
+-    {
+-
+-    }
+-}
+-
+-void slow_ledflash(bool colour)
+-{
+-    if(colour)
+-    {
+-
+-    }
+-}
+-
+ //Wait for buffer empty
+ void gsm_waitx(void)
+ {
+@@ -83,10 +67,11 @@
+     uint16_t x;
+     uint8_t y;
+     repeatoff:
+-    led_switch(2); //Off
++    //led_switch(2); //Off
+     gsm_zerobuff(gsmusd, 127);
+     y = gsm_on();
+-    led_switch(1);//RED
++    ClrWdt();
++    //led_switch(1);//RED
+ //    x = strstr(gsmusd, "RDY");
+     if(y <= 4)                                                                                                                                                                                                                                      if(y == 0)
+     {
+@@ -94,13 +79,13 @@
+         gsm_transmit(0x0D);
+         gsm_receive(1, gsmusm);
+         gsm_msg("AT&F\r");
+-        x = Read_timeout1(gsmusd);
++        x = Read_timeout1(gsmusd, 64);
+         gsm_msg("AT&F0\r");
+-        x = Read_timeout1(gsmums);
++        x = Read_timeout1(gsmums, 64);
+         gsm_msg("AT&V0\r");
+-        x = Read_timeout1(gsmmsg);
++        x = Read_timeout1(gsmmsg, 64);
+         gsm_msg("AT&V\r");
+-        x = Read_timeout1(qrbuffer);
++        x = Read_timeout1(qrbuffer, 128);
+         gsm_msg("AT&D0\r");
+         gsm_receive(1, gsmusd);
+         gsm_msg("AT+IPR=115200\r"); // 115200 or 57600 or 19200
+@@ -145,14 +130,14 @@
+     {
+         goto errorecho;
+     }
+-    led_switch(3); //LED toggle GREEN
++    //led_switch(3); ////LED toggle GREEN
+        gsm_msg((uint8_t*)"AT+CREG=1\r");
+        gsm_receive(1, gsmusm);
+     ClrWdt();
+-    led_switch(0); // Red = 1
++    //led_switch(0); // Red = 1
+        gsmwait:
+     __delay_ms(2);
+-    led_switch(3);
++    //led_switch(3);
+        gsm_msg((uint8_t*)"AT+CREG?\r");
+        gsm_receive(2, gsmusd);
+     q = strstr(gsmusd, "+CREG:");
+@@ -167,7 +152,7 @@
+     {
+         goto repeatoff;
+     }
+-    led_switch(2); //LED toggle GREEN
++    //led_switch(2); ////LED toggle GREEN
+     uint8_t w = get_csq();
+     if(w <= 0)
+     {
+@@ -176,24 +161,24 @@
+     if(w > 9)
+     {
+         //10 - 14, 15 - 19, 20 - 24 and >= 25
+-        LED4_SetHigh();
++        //LED4_SetHigh();
+     }
+     if(w > 14)
+     {
+-        LED3_SetHigh();
++        //LED3_SetHigh();
+     }
+     if(w > 19)
+     {
+-        LED2_SetHigh();
++        //LED2_SetHigh();
+     }
+     if(w > 24)
+     {
+-        LED1_SetHigh();
++        //LED1_SetHigh();
+     }
+
+     gsm_msg((uint8_t*)tsoftid);
+     gsm_receive(2, gsmusd);
+-    led_switch(1);
++    //led_switch(1);
+ }
+
+ uint8_t get_csq(void)
+@@ -209,7 +194,7 @@
+     }
+     else
+     {
+-        led_switch(3); //Toggle led between green and red
++        //led_switch(3); //Toggle led between green and red
+         csqval = 0;
+     }
+     return (uint8_t)csqval;
+@@ -251,23 +236,23 @@
+ */
+ //#if 0
+ /*    gsm_msg((uint8_t*)"AT+CANT?\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CEGPRS=1,2\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+ECHARGE?\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+ECHARGE=1\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+ECHARGE=0\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CBC\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CBATCHK?\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CBATCHK=1\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CBATCHK=0\r");
+-    Read_timeout1(gsmmsg);
++    Read_timeout1(gsmmsg, 64);
+     gsm_msg((uint8_t*)"AT+CBAND?\r");
+     Read_timeout1(gsmmsg);
+     gsm_msg((uint8_t*)"AT+CSDT?\r");//Switch on or off Detecting SIM Card
+@@ -294,13 +279,11 @@
+     gsm_msg((uint8_t*)"AT+CSMINS=1\r");//Enable unsolicited result code
+     Read_timeout1(gsmmsg);//AT+CANT*/
+  //#endif
+-
+-
+ //Read until 3 second timeout for initialisation of network
+ //return message count
+-uint8_t Read_timeout1(uint8_t *msgadd)
++uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms)
+ {
+-    uint8_t v = 0;
++    uint16_t v = 0;
+     PIE3bits.RC1IE = 1;
+     INTCONbits.GIEH = 1;
+     INTCONbits.GIEL = 1;
+@@ -315,7 +298,7 @@
+             T5CONbits.TMR5ON = 0;
+             TMR5_Initialize();
+             T5CONbits.TMR5ON = 1;
+-            if(v < 128)
++            if(v < lngmms)
+             {
+                 v++;
+             }
+@@ -331,40 +314,9 @@
+     msgadd[v] = 0;
+     return v;
+ }
+-uint8_t Read_timeout2(uint8_t *msgadd) //10ms timeout with interrupt read
+-{
+-    uint8_t v = 0;
+-    PIE3bits.RC1IE = 1;
+-    INTCONbits.GIEH = 1;
+-    INTCONbits.GIEL = 1;
+-    TMR3_Initialize();
+-    T3CONbits.TMR3ON = 1;
+-    while(!PIR4bits.TMR3IF)
+-    {
+-        if(PIR3bits.RC1IF)
+-        {
+-            PIR3bits.RC1IF = 0;
+-            msgadd[v] = RC1REG;
+-            T3CONbits.TMR3ON = 0;
+-            TMR3_Initialize();
+-            T3CONbits.TMR3ON = 1;
+-            if(v < 127)
+-            {
+-                v++;
+-            }
+-
+-        }
+-    }
+-    PIE3bits.RC1IE = 0;
+-    INTCONbits.GIEH = 0;
+-    INTCONbits.GIEL = 0;
+-//    msgadd[v] = 0;
+-    return v;
+-}
+-
+ void Read_SMS(void)
+ {
+-    led_switch(2);
++    //led_switch(2);
+     Read_Service();
+  //   base64_encode("22d3cf4f-db05-4609-9773-2312375b4523:", (idx_t) 37, base64buf, (idx_t) 58);
+     __delay_ms(500);
+@@ -377,7 +329,7 @@
+     PIE3bits.RC1IE = 1;
+     INTCONbits.GIEH = 1;
+     INTCONbits.GIEL = 1;
+-    led_switch(2); //off
++    //led_switch(2); //off
+     while(SERVICE_PORT)
+     {
+         int_sms_notify();
+@@ -447,7 +399,7 @@
+                 y = 0;
+                 PIE3bits.RC1IE = 0;
+                 ClrWdt();
+-                led_switch(0); //Green = price store
++                //led_switch(0); //Green = price store
+                 x = strstr(gsmmsg, "Setup,");// check for price set message
+                 if(!x)//Not a setup message, check for merchant key
+                 {
+@@ -457,22 +409,22 @@
+                         x = strstr(gsmmsg, "MID = ");
+                         if(x)
+                         {
+-                            led_switch(1); //Red =  merchant id stored
++                            //led_switch(1); //Red =  merchant id stored
+                             store_mid();
+                             while(SERVICE_PORT)
+                             {
+                                 ClrWdt();
+-                                led_switch(3);
++                                //led_switch(3);
+                             }
+                         }
+-                        led_switch(2); //off
++                        //led_switch(2); //off
+                         gsm_msg(smsdel);//"AT+CMGDA=\"DEL ALL\"\r"
+                         gsm_receive(1, gsmtim);
+                         PIE3bits.RC1IE = 1;
+                     }
+                     else// is a merchant key
+                     {
+-                        led_switch(1); //Red =  merchant key stored
++                        //led_switch(1); //Red =  merchant key stored
+                         store_merchkey();
+                         while(SERVICE_PORT)
+                         {
+@@ -509,7 +461,7 @@
+                 y = strstr(gsmusd, "+CMTI"); //Make sure it's an sms notification
+             }
+         }
+-        led_switch(2) ;
++        //led_switch(2) ;
+     }
+     if(y > 0)
+     {
+@@ -581,11 +533,12 @@
+     rgsm_on:
+     gsm_msg("AT+CPOWD=0\n");
+     delay_10mS(400);//delay 4 seconds after power down
+-    LATCbits.LATC3 = 0;
++    ClrWdt();
++    PWR_LAT = 0;
+     One_Second();//Hold PWR low for 1 second is actually 1.49 seconds
+     ClrWdt();
+-    LATCbits.LATC3 = 1;
+-    uint8_t x = Read_timeout1(gsmusd);
++    PWR_LAT = 1;
++    uint8_t x = Read_timeout1(gsmusd, 128);
+ //    gsm_receive(10, gsmusd);
+     return x;
+ }
+@@ -704,6 +657,41 @@
+     return 1;
+ }
+
++uint8_t Read_timeout2(uint8_t *msgadd,uint16_t lngmms ) //10ms timeout with interrupt read
++{
++    uint16_t v = 0;
++    PIE3bits.RC1IE = 1;
++    INTCONbits.GIEH = 1;
++    INTCONbits.GIEL = 1;
++    TMR5_Initialize();
++    TMR5_WriteTimer(0x1CF3);//15 second timeout
++    T5CONbits.TMR5ON = 1;
++    while(!PIR4bits.TMR5IF)
++    {
++        if(EUSART1_is_rx_ready())
++        {
++            PIR3bits.RC1IF = 0;
++            msgadd[v] = EUSART1_Read();
++            T5CONbits.TMR5ON = 0;
++            TMR5_Initialize();
++            TMR5_WriteTimer(0x1CF3);//15 second timeout
++            T5CONbits.TMR5ON = 1;
++            if(v < lngmms)
++            {
++                v++;
++            }
++            else
++            {
++                break;
++            }
++        }
++    }
++    PIE3bits.RC1IE = 0;
++    INTCONbits.GIEH = 0;
++    INTCONbits.GIEL = 0;
++    msgadd[v] = 0;
++    return v;
++}
+ //PIR3bits.TX1IF -  EUSART1 Transmit Interrupt Flag bit
+ //1 = The EUSART1 transmit buffer, TX1REG, is empty (cleared by writing TX1REG)
+ //0 = The EUSART1 transmit buffer is full

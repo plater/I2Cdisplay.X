@@ -162,7 +162,7 @@ uint8_t urlbuf[200];
 uint8_t * searchbufa;
 
 int16_t price;
-uint8_t channum;
+uint16_t channum;
 /**dispense related
  */
 volatile uint8_t cash;
@@ -241,7 +241,7 @@ void parse_themms(void);
 
 void Test_pfm(void);
 
-void Read_themms(uint8_t* messbuf, uint16_t mmssize);
+bool Read_themms(uint8_t* messbuf, uint16_t mmssize);
 
 void Store_themms(uint32_t flashadd, uint8_t* flashsrc, uint16_t mmssize );
 

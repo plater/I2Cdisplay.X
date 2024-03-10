@@ -37,9 +37,18 @@ void Get_mms(void)
         csqval = Read_timeout1(gsmusd, 64);// look for +CMTI: "SM",3,"MMS PUSH"
         if(csqval > 6)
         {
+            srchbuf0 = strstr(gsmusd, "DEACT");
+            if(srchbuf0)
+            {
+                mms_init();
+                gsm_msg("AT+CMGD=1,4\r");
+                gsm_receive(1, gsmusd);
+            }
             srchbuf0 = strstr(gsmusd, "+CMTI: ");
             if(!srchbuf0)
             {
+                gsm_msg("AT+CMGD=1,4\r");
+                gsm_receive(1, gsmusd);
                 break;
             }
             mmsbyte = *(srchbuf0 + 8);//mmsbyte now contains the index
@@ -73,7 +82,12 @@ void Get_mms(void)
             memset(gsmmsg, NULL, 2048);
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
-            Read_themms(gsmmsg, mmsbyte2);
+            if(!Read_themms(gsmmsg, mmsbyte2))
+            {
+                gsm_msg("AT+CMGD=1,4\r");
+                gsm_receive(1, gsmusd);
+                goto repeatmms;
+            }
             Write_String(storemms, 4);
             parse_themms();
             mmsbyte2 = strlen(gsmmsg);
@@ -95,7 +109,7 @@ void Get_mms(void)
 
 void parse_themms(void)//Format xpm for display
 {
-    uint16_t decim,wprc;
+    uint16_t decim,wprc,amount;
     uint16_t xy = 1;
     srchbuf0 = memchr(gsmmsg, ',', 32); //Look for the first comma
     srchbuf1 = memchr(srchbuf0 + 1, ':', 24); //Look for the colon after info
@@ -108,9 +122,9 @@ void parse_themms(void)//Format xpm for display
     channum = atoi(srchbuf0); // channum contains the channel number
     srchbuf0 = strstr(gsmusd, ",R");
     srchbuf0 = srchbuf0 + 2; //Set at price
-    price = atoi(srchbuf0);//price section
-    wprc = price / 100;
-    decim = price % 100;
+    amount = atoi(srchbuf0);//price section
+    wprc = amount / 100;
+    decim = amount % 100;
     
     credit = sprintf(gsmusd, "Channel %d\nPrice R%.2d.%.2d.", channum, wprc, decim);
     xpmaddress = Chan01_xpm; // xpmaddress stores the channels storage address
@@ -238,7 +252,7 @@ bool MyFLASH_WriteBlock(uint32_t writeAddr, uint8_t *flashWrBufPtr)
     return (NVMCON1bits.WRERR);
 }
 
-void Read_themms(uint8_t* messbuf, uint16_t mmssize)
+bool Read_themms(uint8_t* messbuf, uint16_t mmssize)
 {
     uint16_t mmscnt = 0;
     PIE3bits.RC1IE = 1;
@@ -281,13 +295,23 @@ void Read_themms(uint8_t* messbuf, uint16_t mmssize)
     PIE3bits.RC1IE = 0;// mmscnt   = total file size including header
     INTCONbits.GIEH = 0;//mmsbyte2 = actual data size so mmscnt - mmsbyte2 = header size
     INTCONbits.GIEL = 0;//add header size to gsmmsg and move to gsmmsg
+    if(mmscnt <= mmsbyte2)
+    {
+        Write_String(errormms, 4);
+        return(0);
+    }
     srchbuf0 = strstr(gsmmsg, "/* XPM */");
+    if(!srchbuf0)
+    {
+        return(0);
+    }
     srchbuf1 = memmove(gsmmsg, srchbuf0, mmscnt);
     mmsbyte2++;
     gsmmsg[mmsbyte2] = 0x1A;//EOF
     srchbuf0 = gsmmsg + mmsbyte2 + 1;
     csqval = mmscnt - mmsbyte2;
     memset(srchbuf0, NULL, csqval);
+    return(1);
 }
 
 void convert_mms(void) //Remove message header and any null characters in the body

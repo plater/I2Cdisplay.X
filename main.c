@@ -77,14 +77,17 @@ void main(void)
     DSP_rd2_init();
     DSP_rd3_init();
     DSP_rd4_init();
-    Set_Display(0);
+/*    Set_Display(0);
     Set_Display(1);
     Set_Display(2);
-    Set_Display(3);
+    Set_Display(3);*/
     Graphic_test();
     gsm_init(0);
-    Get_mms();
-
+//    Get_mms();
+    Write_Qrcode(1);
+    Write_Qrcode(2);
+    Write_Qrcode(3);
+    Write_Qrcode(4);
  //   Store_XPM(qrcode1_xpm, qrstat1_xpm);
     while(SERVICE_GetValue())
     {

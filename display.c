@@ -276,10 +276,11 @@ void Write_Qrcode(uint8_t channeln)
     uint16_t l, zbu, w;
     uint8_t *e;
     uint8_t over;
-    
+    Reset_Alldisp();
+    Set_Display(channeln);
     xy = 1;
     xpmaddress = Chan01_xpm; // xpmaddress stores the channels storage address
-    while(xy < channum)
+    while(xy < channeln)
     {
         xpmaddress = xpmaddress + STORAGE_SIZE;
         xy++;
@@ -398,16 +399,16 @@ void Identify_D(uint8_t dispnum)
 {
     switch(dispnum)
     {
-        case 0 :
+        case 1 :
             Set_Display(0);
             Write_String(display1, 6);
-        case 1 :
+        case 2 :
             Set_Display(1);
             Write_String(display2, 6);
-        case 2 :
+        case 3 :
             Set_Display(2);
             Write_String(display3, 6);
-        case 3 :
+        case 4 :
             Set_Display(3);
             Write_String(display4, 6);
     }
@@ -437,22 +438,22 @@ void Set_Alldisp(void)
 
 void Reset_Display(uint8_t dispnum)
 {
-    dispnum = dispnum & 0x03;
+    dispnum = dispnum & 0x07;
     switch(dispnum)
     {
-        case 0 :
+        case 1 :
             RD1_SetHigh();
             RD1PPS = 0x0;
             break;
-        case 1 :
+        case 2 :
             RD2_SetHigh();
             RD2PPS = 0x0;
             break;
-        case 2 :
+        case 3 :
             RD3_SetHigh();
             RD3PPS = 0x0;
             break;
-        case 3 :
+        case 4 :
             RD4_SetHigh();
             RD4PPS = 0x0;
     }
@@ -461,22 +462,22 @@ void Reset_Display(uint8_t dispnum)
 
 void Set_Display(uint8_t dispnum)
 {
-    dispnum = dispnum & 0x03;
+    dispnum = dispnum & 0x07;
     switch(dispnum)
     {
-        case 0 :
+        case 1 :
             SSP2DATPPS = 0x19;   //RD1->MSSP2:SDA2;
             RD1PPS = 0x12;
             break;
-        case 1 :
+        case 2 :
             SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2;
             RD2PPS = 0x12;
             break;
-        case 2 :
+        case 3 :
             SSP2DATPPS = 0x1B;   //RD3->MSSP2:SDA2;
             RD3PPS = 0x12;
             break;
-        case 3 :
+        case 4 :
             SSP2DATPPS = 0x1C;
             RD4PPS = 0x12;
     }

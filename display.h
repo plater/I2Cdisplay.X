@@ -28,6 +28,7 @@ static const uint8_t plwait[]   = "  Please wait";
 static const uint8_t waitmms[]  = "  Waiting for mms";
 static const uint8_t downmms[]  = " Downloading mms";
 static const uint8_t storemms[] = " Storing mms";
+static const uint8_t errormms[] = "Download failed";
 
 static uint8_t DData[8];
 

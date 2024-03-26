@@ -65,13 +65,13 @@ void main(void)
 //    INTERRUPT_GlobalInterruptEnable();
 
     // Disable the Global Interrupts
-    INTERRUPT_GlobalInterruptDisable();
+ //   INTERRUPT_GlobalInterruptDisable();
 
     // Enable the Peripheral Interrupts
     //INTERRUPT_PeripheralInterruptEnable();
 
     // Disable the Peripheral Interrupts
-    INTERRUPT_PeripheralInterruptDisable();
+ //   INTERRUPT_PeripheralInterruptDisable();
     Reset_Alldisp();
     DSP_rd1_init();
     DSP_rd2_init();
@@ -83,7 +83,7 @@ void main(void)
     Set_Display(3);*/
     Graphic_test();
     gsm_init(0);
-//    Get_mms();
+    Get_mms();
     Write_Qrcode(1);
     Write_Qrcode(2);
     Write_Qrcode(3);

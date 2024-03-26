@@ -24,19 +24,17 @@ OK
 //DAILYASAP50
 void Get_mms(void)
 {
-    repeaterror:
     Set_Alldisp();
     Graphic_Clear();
     mms_init();
     Write_String(waitmms, 4);
     gsm_msg("AT+CMGD=1,4\r");
     gsm_receive(1, gsmusd);
-    ClrWdt();
+    
     while(SERVICE_GetValue())
     {
         repeatmms:
         csqval = Read_timeout1(gsmusd, 64);// look for +CMTI: "SM",3,"MMS PUSH"
-        ClrWdt();
         if(csqval > 6)
         {
             srchbuf0 = strstr(gsmusd, "DEACT");
@@ -54,41 +52,25 @@ void Get_mms(void)
                 break;
             }
             mmsbyte = *(srchbuf0 + 8);//mmsbyte now contains the index
-            uint8_t retcnt = 0;
-            retrypush:
             gsm_msg("AT+CMMSRDPUSH=1\r");
             csqval = Read_timeout1(gsmusd, 383);
             srchbuf0 = strstr(gsmusd, "+CMMSRDPUSH:");
-            ClrWdt();
             if(srchbuf0)
             {
                 credit = strlen(srchbuf0);
                 srchbuf1 = memchr(srchbuf0, 0x20, credit);
                 mmsbyte = atoi(srchbuf1 + 1); //mmsbyte now contains the message index
             }
-            else
-            {
-                retcnt++;
-                if(retcnt <= 6)
-                {
-                    goto retrypush;
-                }
-                Write_String(errormms, 4);
-                while(SERVICE_GetValue()){};
-                goto repeaterror;
-            }
 /* +CMTI: "SM",1,"MMS PUSH",2,1 use "PUSH," to get index
    +CMTI: "SM",2,"MMS PUSH",2,2 Search 
 +CMMSRECV: "+27766520007","2024-02-17,12:29:39","",2023
 1,"smil.xml",10,242
 2,"text_0.txt",4,168*/
-            ClrWdt();
-            memset(gsmusd, NULL, 128); 
+            memset(gsmusd, NULL, 192); 
             Write_String(downmms, 4);
             sprintf(gsmums, "AT+CMMSRECV=%d\r", mmsbyte); //This takes 10 seconds maybe more
             gsm_msg(gsmums);
-            csqval = Read_timeout5(gsmusd, 128);//<fileIndex,name,type,filesize>
-            ClrWdt();
+            csqval = Read_timeout2(gsmusd, 383);//<fileIndex,name,type,filesize>
             srchbuf0 = strstr(gsmusd, "+CMMSRECV:");
             if(srchbuf0)
             {
@@ -97,29 +79,23 @@ void Get_mms(void)
                 mmsbyte2 = atoi(srchbuf1); //mmsbyte now contains the file size to be used with read
             }
             credit = csqval;
-            memset(gsmmsg, NULL, 1800);
+            memset(gsmmsg, NULL, 2048);
             sprintf(gsmums, "AT+CMMSREAD=%d\r", mmsbyte);
             gsm_msg(gsmums);
-            ClrWdt();
-            gsmflags.cfun = Read_themms(gsmmsg, mmsbyte2);
-            if(gsmflags.cfun == 0)
+            if(!Read_themms(gsmmsg, mmsbyte2))
             {
                 gsm_msg("AT+CMGD=1,4\r");
                 gsm_receive(1, gsmusd);
                 goto repeatmms;
             }
             Write_String(storemms, 4);
-            ClrWdt();
             parse_themms();
             mmsbyte2 = strlen(gsmmsg);
             srchbuf2 = gsmmsg + mmsbyte2;
             memset(srchbuf2, NULL, 256);
             Store_themms(xpmaddress, gsmmsg, mmsbyte2);
             Write_Qrcode(channum);
-            while(SERVICE_GetValue())
-            {
-                ClrWdt();
-            }
+            while(SERVICE_GetValue());
             gsm_msg("AT+CMGD=1,4\r");
             gsm_receive(1, gsmusd);
             Graphic_Clear();
@@ -149,7 +125,7 @@ void parse_themms(void)//Format xpm for display
     amount = atoi(srchbuf0);//price section
     wprc = amount / 100;
     decim = amount % 100;
-    prices[channum] = amount;
+    
     credit = sprintf(gsmusd, "Channel %d\nPrice R%.2d.%.2d.", channum, wprc, decim);
     xpmaddress = Chan01_xpm; // xpmaddress stores the channels storage address
     while(xy < channum)
@@ -185,7 +161,7 @@ void parse_themms(void)//Format xpm for display
     }
     srchbuf2[0] = '\e';
 }
-#if 0
+
 void Test_pfm(void)
 {
     mmsbyte2 = (strlen(mms_xpm)) + 2;
@@ -196,7 +172,7 @@ void Test_pfm(void)
     memset(srchbuf2, NULL, 256);
     Store_themms(xpmaddress, gsmmsg, mmsbyte2);
 }
-#endif
+
 void Store_themms(uint32_t flashadd, uint8_t* flashsrc, uint16_t mmssize ) //mmssize stores the file size
 {
     #if 1
@@ -379,42 +355,6 @@ void mms_init(void)
     gsm_receive(2, gsmusd);
     gsm_msg("AT+CMMSEDIT=0\r");
     gsm_receive(1, gsmtim);
-}
-
-uint8_t Read_timeout5(uint8_t *msgadd,uint16_t lngmms ) //10ms timeout with interrupt read
-{
-    uint16_t v = 0;
-    PIE3bits.RC1IE = 1;
-    INTCONbits.GIEH = 1;
-    INTCONbits.GIEL = 1;
-    TMR5_Initialize();
-    TMR5_WriteTimer(0x01);//15 second timeout
-    T5CONbits.TMR5ON = 1;
-    while(!PIR4bits.TMR5IF)
-    {
-        if(EUSART1_is_rx_ready())
-        {
-            PIR3bits.RC1IF = 0;
-            msgadd[v] = EUSART1_Read();
-            T5CONbits.TMR5ON = 0;
-            TMR5_Initialize();
-            TMR5_WriteTimer(0x01);//15 second timeout
-            T5CONbits.TMR5ON = 1;
-            if(v < lngmms)
-            {
-                v++;
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-    PIE3bits.RC1IE = 0;
-    INTCONbits.GIEH = 0;
-    INTCONbits.GIEL = 0;
-    msgadd[v] = 0;
-    return v;
 }
 /**
  End of File

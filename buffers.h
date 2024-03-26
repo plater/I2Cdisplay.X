@@ -92,7 +92,7 @@ extern uint8_t * srchbuf0;
 extern uint8_t * srchbuf1;
 extern uint8_t * srchbuf2;
 
-uint8_t gsmmsg[2048];
+uint8_t gsmmsg[1800];
 //ussd storage
 uint8_t gsmusd[128];
 
@@ -228,6 +228,8 @@ uint8_t Read_timeout(uint8_t *msgadd);
 uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms);
 
 uint8_t Read_timeout2(uint8_t *msgadd,uint16_t lngmms ); //10ms timeout with interrupt read
+
+uint8_t Read_timeout5(uint8_t *msgadd,uint16_t lngmms );
 
 uint8_t get_csq(void);
 

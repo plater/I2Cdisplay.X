@@ -50,6 +50,27 @@ RD3PPS = 0x11;   //RD3->MSSP2:SCL2;
 SSP2DATPPS = 0x1A;   //RD2->MSSP2:SDA2
 SSP2CLKPPS = 0x1B;   //RD3->MSSP2:SCL2;
 */
+struct
+{
+    unsigned declined : 1;
+    unsigned approved : 1;
+    unsigned poll : 1;
+    unsigned timer4 : 1;
+    unsigned swclosed : 1;
+    unsigned inittype : 1;
+    unsigned display : 1;
+    unsigned spare5 : 1;
+} vendflags;
+
+struct
+{
+    unsigned chan1 : 1;
+    unsigned chan2 : 1;
+    unsigned chan3 : 1;
+    unsigned chan4 : 1;
+    unsigned spare : 4;
+} stockflags;
+
 
 #endif	//XC_HEADER_TEMPLATE_H
 
@@ -61,6 +82,8 @@ SSP2CLKPPS = 0x1B;   //RD3->MSSP2:SCL2;
 #define XPM_HEADER_SIZE   128  //This is the size of the XPM's header
 #define DISPLAY_CHAR      16 //16 characters per line
 #define DISPLAY_COL       128//Display width is 128 pixels
+#define PAGE_SIZE         WRITE_FLASH_BLOCKSIZE
+
 __at(0x2000)
 extern const uint8_t Chan01_xpm[1920];
 __at(0x2780)
@@ -91,7 +114,13 @@ const uint8_t Chan04_info[128];
 extern uint8_t * srchbuf0;
 extern uint8_t * srchbuf1;
 extern uint8_t * srchbuf2;
-
+extern uint8_t * srchbuf3;
+extern uint8_t * srchbuf4;
+#if 1
+__at(0x4000)
+extern const uint8_t numstore[24576];
+#endif
+const uint8_t numstore[24576];
 uint8_t gsmmsg[1800];
 //ussd storage
 uint8_t gsmusd[128];
@@ -109,7 +138,7 @@ uint8_t * xpmaddress;
     uint8_t ledspeed;
     uint8_t ledratio;
 
-//Gsm related memory
+//Gsm related memory64
 uint8_t gsmbyte;
 uint16_t mmsbyte;
 uint16_t mmsbyte2;
@@ -152,7 +181,6 @@ uint16_t  prices[8];
 
 //uint8_t qchan[2];
 //uint8_t qprice[4];
-
 signed int translngth;
 uint8_t transid[10];//195
 unsigned long long cntlength;
@@ -196,7 +224,7 @@ void build_url(void);
 
 void led_opperate(void);
 
-void led_switch(uint8_t color);
+uint8_t led_switch(uint8_t color);
 
 void price_init(void);
 
@@ -225,11 +253,13 @@ uint8_t Read_timeoutg(uint8_t *msgadd);
 
 uint8_t Read_timeout(uint8_t *msgadd);
 
-uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms);
+uint8_t Read_timeout1(uint8_t *msgadd);
 
 uint8_t Read_timeout2(uint8_t *msgadd,uint16_t lngmms ); //10ms timeout with interrupt read
 
-uint8_t Read_timeout5(uint8_t *msgadd,uint16_t lngmms );
+uint8_t Read_timeout5(uint8_t *msgadd,uint16_t lngmms);
+
+void Timer2_Run500(uint8_t period);
 
 uint8_t get_csq(void);
 
@@ -275,6 +305,8 @@ bool Read_Service(void);
 
 uint8_t Long_Press(void);
 
+uint8_t Long_PressS(void);
+
 void dispense_test(void);
 
 void Orange_light(void);
@@ -297,9 +329,13 @@ uint16_t DATAEE_ReadWord(uint16_t bAdd);
 
 void Store_XPM(uint8_t *xpmname, uint8_t* xpmstat);
 
-void Write_String(uint8_t *lcdstring, uint8_t lcdline);
+void Write_StringD(uint8_t *lcdstring, uint8_t lcdline, uint8_t dispnum);
+
+void Write_String(const uint8_t *lcdstring, uint8_t lcdline);
 
 void Continue_String(uint8_t *clcdstring);
+
+void Set_Line(uint8_t line);
 
 void Write_Font(uint8_t _font);
 
@@ -307,9 +343,13 @@ void SPI_write8bit(uint8_t data);
 
 void Write_Qrcode(uint8_t channeln);
 
+void Disp_QRcodes(void);
+
 void Qr_Text(const uint8_t xpmname[], uint8_t xpos, uint8_t ypost);
 
 void Graphic_Clear(void);
+
+void Graphic_ClearA(void);
 
 void Graphic_test(void);
 
@@ -352,6 +392,7 @@ void I2C_Ack(void);
 
 void I2C_Nack(void);
 
+void Add_number(void);
 
 #ifdef	__cplusplus
 extern "C" {

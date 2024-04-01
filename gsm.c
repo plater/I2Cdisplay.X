@@ -79,13 +79,13 @@ void gsm_init(bool inittype)
         gsm_transmit(0x0D);
         gsm_receive(1, gsmusm);
         gsm_msg("AT&F\r");
-        x = Read_timeout1(gsmusd, 64);
+        x = Read_timeout1(gsmusd);
         gsm_msg("AT&F0\r");
-        x = Read_timeout1(gsmums, 64);
+        x = Read_timeout1(gsmums);
         gsm_msg("AT&V0\r");
-        x = Read_timeout1(gsmmsg, 64);
+        x = Read_timeout1(gsmmsg);
         gsm_msg("AT&V\r");
-        x = Read_timeout1(qrbuffer, 128);
+        x = Read_timeout1(qrbuffer);
         gsm_msg("AT&D0\r");
         gsm_receive(1, gsmusd);
         gsm_msg("AT+IPR=115200\r"); // 115200 or 57600 or 19200
@@ -281,7 +281,7 @@ Value 	RSSI dBm 	Condition
  //#endif
 //Read until 3 second timeout for initialisation of network
 //return message count
-uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms)
+uint8_t Read_timeout1(uint8_t *msgadd)
 {
     uint16_t v = 0;
     PIE3bits.RC1IE = 1;
@@ -298,7 +298,7 @@ uint8_t Read_timeout1(uint8_t *msgadd, uint16_t lngmms)
             T5CONbits.TMR5ON = 0;
             TMR5_Initialize();
             T5CONbits.TMR5ON = 1;
-            if(v < lngmms)
+            if(v < 128)
             {
                 v++;
             }
@@ -538,7 +538,7 @@ uint8_t gsm_on(void)
     One_Second();//Hold PWR low for 1 second is actually 1.49 seconds
     ClrWdt();
     PWR_LAT = 1;
-    uint8_t x = Read_timeout1(gsmusd, 128);
+    uint8_t x = Read_timeout1(gsmusd);
 //    gsm_receive(10, gsmusd);
     return x;
 }

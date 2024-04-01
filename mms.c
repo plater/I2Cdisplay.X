@@ -35,7 +35,7 @@ void Get_mms(void)
     while(SERVICE_GetValue())
     {
         repeatmms:
-        csqval = Read_timeout1(gsmusd, 64);// look for +CMTI: "SM",3,"MMS PUSH"
+        csqval = Read_timeout1(gsmusd);// look for +CMTI: "SM",3,"MMS PUSH"
         ClrWdt();
         if(csqval > 6)
         {
@@ -57,7 +57,7 @@ void Get_mms(void)
             uint8_t retcnt = 0;
             retrypush:
             gsm_msg("AT+CMMSRDPUSH=1\r");
-            csqval = Read_timeout1(gsmusd, 383);
+            csqval = Read_timeout1(gsmusd);
             srchbuf0 = strstr(gsmusd, "+CMMSRDPUSH:");
             ClrWdt();
             if(srchbuf0)

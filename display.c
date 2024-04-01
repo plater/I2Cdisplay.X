@@ -58,7 +58,7 @@ void Clr_Line(void)
      }
 }
 
-void Write_String(uint8_t *lcdstring, uint8_t lcdline)
+void Write_String(const uint8_t *lcdstring, uint8_t lcdline)
 {
     LATDbits.LATD3 = 0; //Select display
     //Send 0x40 Display start line 0

@@ -116,11 +116,11 @@ extern uint8_t * srchbuf1;
 extern uint8_t * srchbuf2;
 extern uint8_t * srchbuf3;
 extern uint8_t * srchbuf4;
-#if 1
+
 __at(0x4000)
 extern const uint8_t numstore[24576];
-#endif
-const uint8_t numstore[24576];
+//const uint8_t numstore[24576];
+
 uint8_t gsmmsg[1800];
 //ussd storage
 uint8_t gsmusd[128];
